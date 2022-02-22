@@ -1,18 +1,43 @@
-# This is a basic workflow to help you get started with Actions
+# # This is a basic workflow to help you get started with Actions
 
-name: CI
+# name: CI
+
+# on:
+#   push:
+#     branches:
+#     - "*"
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: borales/actions-yarn@v2.3.0
+#       - run: |
+#          yarn ganache
+#          yarn test
+
+name: Node CI
 
 on:
   push:
-    branches:
+   branches:
     - "*"
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
-      - run: |
-         yarn ganache
-         yarn test
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: yarn install
+    - run: yarn ganache
+    - run: yarn test
