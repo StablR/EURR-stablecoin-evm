@@ -6,17 +6,22 @@ on:
   push:
     branches:
     - "*"
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        Plan: [ganashe, test]
     steps:
       - uses: actions/checkout@v2
       - uses: borales/actions-yarn@v2.3.0
         with:
          cmd: install
       - uses: borales/actions-yarn@v2.3.0
-        with:
-         cmd: |
-             ganache
-             test
+      - name: Run build
+        env:
+          PLAN: ${{matrix.Plan}}
+        run: |
+          ganache
+          test
