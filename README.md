@@ -1,4 +1,4 @@
-# SafeNed Stablecoin
+# StablR Token
 
 This repository is based on the [CENTRE](https://centre.io) Token repository taken from the following [commit](https://github.com/centrehq/centre-tokens/commit/0d3cab14ebd133a83fc834dbd48d0468bdf0b391).
 
@@ -10,8 +10,8 @@ Requirements:
 - Yarn
 
 ```
-$ git clone git@github.com:centrehq/safened-stablecoin.git
-$ cd safened-stablecoin
+$ git clone git@github.com:centrehq/stablr-token.git
+$ cd stablr-token
 $ npm i -g yarn       # Install yarn if you don't already have it
 $ yarn install        # Install dependencies
 $ yarn setup          # Setup Git hooks
@@ -72,7 +72,7 @@ $ yarn coverage
 
 ## Deployment
 
-Create a copy of the file `config.js.example`, and name it `config.js`. Enter
+Populate (create if missing) the `config.js` configuration file. Enter
 the BIP39 mnemonic phrase, the INFURA API key to use for deployment, and the
 addresses of proxy admin, owner, master minter, blacklister, and pauser in
 `config.js`. This file must not be checked into the repository. To prevent

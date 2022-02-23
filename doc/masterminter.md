@@ -5,7 +5,7 @@ stablecoin minters. Instead a more efficient governance solution will be used ba
 the [Qredo Network](https://www.qredo.com/) which provides a cost-efficent and flexible option.*
 
 The MasterMinter is a governance contract. It delegates the functionality of the
-`masterMinter` role in the SafeNed Stablecoin contract to multiple addresses. (The
+`masterMinter` role in the StablR token contract to multiple addresses. (The
 `masterMinter` role can add and remove minters from a FiatToken and set their
 allowances.) The MasterMinter contract delegates the minter management
 capability to `controllers`. Each `controller` manages exactly one `minter`, and

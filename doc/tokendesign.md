@@ -1,6 +1,6 @@
-# SafeNed Fiat Token
+# StablR Fiat Token
 
-The SafeNed Fiat Token contract is an ERC-20 compatible token. It allows
+The StablR Fiat Token contract is an ERC-20 compatible token. It allows
 minting/burning of tokens by multiple entities, pausing all activity, freezing
 of individual addresses, and a way to upgrade the contract so that bugs can be
 fixed or features added.
@@ -20,8 +20,8 @@ functionality:
 - `owner` - re-assign any of the roles except for `admin`
 - `admin` - upgrade the contract, and re-assign itself
 
-SafeNed will control the address of all roles, minters will be
-controlled by the entities that the SafeNed `masterMinter` elects to make minters
+StablR will control the address of all roles, minters will be
+controlled by the entities that the StablR `masterMinter` elects to make minters
 
 ## ERC-20
 
@@ -161,10 +161,10 @@ The Fiat Token uses the zeppelinos Unstructured-Storage Proxy pattern
 [FiatTokenV1.sol](../contracts/FiatTokenV1.sol) is the implementation, the
 actual token will be a Proxy contract
 ([FiatTokenProxy.sol](../contracts/FiatTokenProxy.sol)) which will forward all
-calls to `FiatToken` via delegatecall. This pattern allows SafeNed to upgrade the
+calls to `FiatToken` via delegatecall. This pattern allows StablR to upgrade the
 logic of any deployed tokens seamlessly.
 
-- SafeNed will upgrade the token via a call to `upgradeTo` or `upgradeToAndCall`
+- StablR will upgrade the token via a call to `upgradeTo` or `upgradeToAndCall`
   if initialization is required for the new version.
 - Only the `admin` role may call `upgradeTo` or `upgradeToAndCall`.
 
