@@ -72,8 +72,8 @@ available, but can only be called once per proxy.
 
    ```
    initialize(
-          "USD//C",
-          "USDC",
+          "USD//R",
+          "USDR",
           "USD",
           6,
           masterMinterAddress,

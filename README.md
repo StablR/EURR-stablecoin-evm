@@ -10,7 +10,7 @@ Requirements:
 - Yarn
 
 ```
-$ git clone git@github.com:centrehq/stablr-token.git
+$ git clone git@github.com:qredo/stablr-token.git
 $ cd stablr-token
 $ npm i -g yarn       # Install yarn if you don't already have it
 $ yarn install        # Install dependencies
