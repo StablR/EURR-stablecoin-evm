@@ -1,6 +1,6 @@
-# centre-tokens
+# SafeNed Stablecoin
 
-Fiat tokens on the [CENTRE](https://centre.io) network.
+This repository is based on the [CENTRE](https://centre.io) Token repository taken from the following [commit](https://github.com/centrehq/centre-tokens/commit/0d3cab14ebd133a83fc834dbd48d0468bdf0b391).
 
 ## Setup
 
@@ -10,8 +10,8 @@ Requirements:
 - Yarn
 
 ```
-$ git clone git@github.com:centrehq/centre-tokens.git
-$ cd centre-tokens
+$ git clone git@github.com:centrehq/safened-stablecoin.git
+$ cd safened-stablecoin
 $ npm i -g yarn       # Install yarn if you don't already have it
 $ yarn install        # Install dependencies
 $ yarn setup          # Setup Git hooks
@@ -19,9 +19,10 @@ $ yarn setup          # Setup Git hooks
 
 ## TypeScript type definition files for the contracts
 
-To generate type definitions:
+Install NPM dependencies and generate type definitions:
 
 ```
+$ npm install
 $ yarn compile && yarn typechain
 ```
 
@@ -80,13 +81,6 @@ accidental check-ins, `config.js` is in `.gitignore`.
 Run `yarn migrate --network NETWORK`, where NETWORK is either `mainnet` or
 `ropsten`.
 
-## Contracts
-
-The implementation uses 2 separate contracts - a proxy contract
-(`FiatTokenProxy.sol`) and an implementation contract (`FiatToken.sol`). This
-allows upgrading the contract, as a new implementation contact can be deployed
-and the Proxy updated to point to it.
-
 ## Verifcation
 
 ### Example 1
@@ -100,6 +94,13 @@ https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
 ```truffle run verify FiatTokenProxy@YOURCONTRACTADDRESS --network ropsten```
 
 https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+
+## Contracts
+
+The implementation uses 2 separate contracts - a proxy contract
+(`FiatTokenProxy.sol`) and an implementation contract (`FiatToken.sol`). This
+allows upgrading the contract, as a new implementation contact can be deployed
+and the Proxy updated to point to it.
 
 ### FiatToken
 

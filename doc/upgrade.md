@@ -141,9 +141,7 @@ possibly new logic) were added.
 2. Broadcast the transaction
 3. Check that the implementation field of the proxy matches the address of the
    upgraded token by calling web3.eth.getStorageAt(proxy.address, implSlot),
-   where implSlot is defined in the contract as a hardcoded field. As of CENTRE
-   Fiat Token v1.0.0 that slot is
-   0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b.
+   where implSlot is defined in the contract as a hardcoded field.
    Alternatively, getImplementation may be called on the proxy with the
    adminAccount.
 4. If the address in 3) does not match, it is likely a wrong address was used.
@@ -157,9 +155,7 @@ possibly new logic) were added.
 2. Broadcast the transaction
 3. Check that the implementation field of the proxy matches the address of the
    upgraded token by calling web3.eth.getStorageAt(proxy.address, implSlot),
-   where implSlot is defined in the contract as a hardcoded field. As of CENTRE
-   Fiat Token v1.0.0 that slot is
-   0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b.
+   where implSlot is defined in the contract as a hardcoded field.
    Alternatively, getImplementation may be called on the proxy with the admin
    account.
 4. If the address in 3) does not match, it is likely a wrong address was used.
