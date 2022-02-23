@@ -16,7 +16,7 @@ contract("FiatTokenV2", (accounts) => {
     fiatToken = await FiatTokenV2.new();
     await fiatToken.initialize(
       "USD Coin",
-      "USDC",
+      "USDR",
       "USD",
       6,
       fiatTokenOwner,
