@@ -1,7 +1,11 @@
 # MasterMinter contract
 
+>*The MasterMinter governance contract structure is an alternative option for managing
+stablecoin minters. Instead a more efficient governance solution will be used based on
+the [Qredo Network](https://www.qredo.com/) which provides a cost-efficent and flexible option.*
+
 The MasterMinter is a governance contract. It delegates the functionality of the
-`masterMinter` role in the CENTRE USDC contract to multiple addresses. (The
+`masterMinter` role in the StablR token contract to multiple addresses. (The
 `masterMinter` role can add and remove minters from a FiatToken and set their
 allowances.) The MasterMinter contract delegates the minter management
 capability to `controllers`. Each `controller` manages exactly one `minter`, and
@@ -18,7 +22,7 @@ The `MasterMinter` contract has the following roles:
 
 - `owner` - adds and removes controllers, sets the address of the
   `minterManager`, and sets the owner.
-- `minterManager` - address of a contract (e.g. USDC) with a
+- `minterManager` - address of a contract (e.g. USDR) with a
   `MinterManagementInterface`. The `minterManager` contract stores information
   about minter allowances and which minters are enabled/disabled.
 - `controller` - each controller manages exactly one minter. A controller can
@@ -45,7 +49,7 @@ contract to call minter management functions on the FiatToken contract:
 
 Together, these four functions are defined as the `MinterManagementInterface`.
 The `MasterMinter` contains the address of a `minterManager` that implements the
-`MinterManagementInterface`. The `MasterMinter` interacts with the USDC token
+`MinterManagementInterface`. The `MasterMinter` interacts with the Stablecoin token
 via the `minterManager`.
 
 When a `controller` calls a function on `MasterMinter`, the `MasterMinter` will
@@ -81,7 +85,7 @@ the `MasterMinter` and the `FiatToken` do their own access control.
 # Deployment
 
 The `MasterMinter` may be deployed independently of the `FiatToken` contract
-(e.g. USDC).
+(e.g. USDR).
 
 - <b>FiatToken</b> then <b>MasterMinter.</b> Deploy `MasterMinter` and set the
   `minterManager` to point to the `FiatToken` in the constructor. Then use the

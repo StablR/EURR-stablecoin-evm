@@ -1,6 +1,6 @@
-# centre-tokens
+# StablR Token
 
-Fiat tokens on the [CENTRE](https://centre.io) network.
+This repository is based on the [CENTRE](https://centre.io) Token repository taken from the following [commit](https://github.com/centrehq/centre-tokens/commit/0d3cab14ebd133a83fc834dbd48d0468bdf0b391).
 
 ## Setup
 
@@ -10,8 +10,8 @@ Requirements:
 - Yarn
 
 ```
-$ git clone git@github.com:centrehq/centre-tokens.git
-$ cd centre-tokens
+$ git clone git@github.com:qredo/stablr-token.git
+$ cd stablr-token
 $ npm i -g yarn       # Install yarn if you don't already have it
 $ yarn install        # Install dependencies
 $ yarn setup          # Setup Git hooks
@@ -19,9 +19,10 @@ $ yarn setup          # Setup Git hooks
 
 ## TypeScript type definition files for the contracts
 
-To generate type definitions:
+Install NPM dependencies and generate type definitions:
 
 ```
+$ npm install
 $ yarn compile && yarn typechain
 ```
 
@@ -71,7 +72,7 @@ $ yarn coverage
 
 ## Deployment
 
-Create a copy of the file `config.js.example`, and name it `config.js`. Enter
+Populate (create if missing) the `config.js` configuration file. Enter
 the BIP39 mnemonic phrase, the INFURA API key to use for deployment, and the
 addresses of proxy admin, owner, master minter, blacklister, and pauser in
 `config.js`. This file must not be checked into the repository. To prevent
@@ -79,6 +80,20 @@ accidental check-ins, `config.js` is in `.gitignore`.
 
 Run `yarn migrate --network NETWORK`, where NETWORK is either `mainnet` or
 `ropsten`.
+
+## Verifcation
+
+### Example 1
+```truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten```
+
+https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+
+### Example 2
+```truffle run verify FiatTokenV2@YOURCONTRACTADDRESS --network ropsten```
+
+```truffle run verify FiatTokenProxy@YOURCONTRACTADDRESS --network ropsten```
+
+https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
 
 ## Contracts
 

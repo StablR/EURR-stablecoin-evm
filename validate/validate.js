@@ -1,22 +1,22 @@
-// Address of the FiatToken Implementation
-const fiatTokenAddress = "0x0882477e7895bdc5cea7cb1552ed914ab157fe56";
+// Address of the FiatToken Implementation - replace with real address
+const fiatTokenAddress = "0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf";
 
-// Address of the FiatToken Proxy
-const fiatTokenProxyAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+// Address of the FiatToken Proxy - replace with real address
+const fiatTokenProxyAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 
-// role addresses
-const MASTER_MINTER = 0x1500a138523709ce66c8b9abe678abc1b6c5a7b7;
-const PAUSER = 0xe8e13e1b6d363c270ef3a5ab466ebad8326311bb;
-const UPGRADER = 0x69005ff70072c57547dc44ea975d85ea60e5b196;
-const OWNER = 0xa61e278899a8553d93d14eb19ba2791e05069e87;
-const BLACKLISTER = 0x063d13783a0a2ce65b1ca00d9e897e6c8b1ec86b;
+// role addresses - replace with real addresses
+const MASTER_MINTER = "0x1500a138523709ce66c8b9abe678abc1b6c5a7b7";
+const PAUSER = "0xe8e13e1b6d363c270ef3a5ab466ebad8326311bb";
+const UPGRADER = "0x69005ff70072c57547dc44ea975d85ea60e5b196";
+const OWNER = "0xa61e278899a8553d93d14eb19ba2791e05069e87";
+const BLACKLISTER = "0x063d13783a0a2ce65b1ca00d9e897e6c8b1ec86b";
 
 // Addresses of known minters - currently fake minters
 // If replacing with real minters need to modify printMinterInfo
 const minters = ["0x0000", "0x0001"];
 
-const NAME = "USD//C";
-const SYMBOL = "USDC";
+const NAME = "StablR USD";
+const SYMBOL = "USDR";
 const CURRENCY = "USD";
 const DECIMALS = 6;
 const TOTALSUPPLY = 0;

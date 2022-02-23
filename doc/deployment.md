@@ -14,7 +14,7 @@ available, but can only be called once per proxy.
 1. Deploy [FiatTokenV1](../contracts/FiatTokenV1.sol)
 2. Initialize the fields in FiatToken via the `initialize` method. The values
    are not important, but this will stop anyone else initializing the roles and
-   trying to use it as a token or pass it off as a real CENTRE token.
+   trying to use it as a token or pass it off as a real StablR token.
    ```
    initialize(
           "",
@@ -32,8 +32,8 @@ available, but can only be called once per proxy.
 
 ## Deploying a Proxy:
 
-1. Obtain addresses for the various contract roles from CENTRE ops. The keys for
-   these addresses will be stored offline. The address needed are:
+1. Obtain addresses for the various contract roles from StablR. The keys for
+   these addresses will be stored securely. The address needed are:
 
    ```
    admin
@@ -65,15 +65,15 @@ available, but can only be called once per proxy.
 4. Initialize the proxy, via the `initialize` method. This call will get
    forwarded to the implementation contract, but since it is via `delegatecall`
    it will run in the context of the Proxy contract, so the fields it is
-   initializing will be stored it the storage of the Proxy. The values passed
+   initializing will be stored in the storage of the Proxy. The values passed
    here are important, especially for the roles that will control the contract.
-   These addresses should be obtained from CENTRE ops, and the keys will be
-   stored offline.
+   These addresses should be obtained from StablR, and the keys will be
+   stored securely.
 
    ```
    initialize(
-          "USD//C",
-          "USDC",
+          "USD//R",
+          "USDR",
           "USD",
           6,
           masterMinterAddress,
