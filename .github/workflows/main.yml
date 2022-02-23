@@ -13,4 +13,4 @@ jobs:
       - uses: actions/checkout@v2
       - uses: borales/actions-yarn@v2.3.0
       - run: yarn ganache -d > /dev/null &
-      - run: yarn test:ganache
+      - run: yarn test
