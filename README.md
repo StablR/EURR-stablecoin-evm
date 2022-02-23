@@ -87,6 +87,20 @@ The implementation uses 2 separate contracts - a proxy contract
 allows upgrading the contract, as a new implementation contact can be deployed
 and the Proxy updated to point to it.
 
+## Verifcation
+
+### Example 1
+```truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten```
+
+https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+
+### Example 2
+```truffle run verify FiatTokenV2@YOURCONTRACTADDRESS --network ropsten```
+
+```truffle run verify FiatTokenProxy@YOURCONTRACTADDRESS --network ropsten```
+
+https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+
 ### FiatToken
 
 The FiatToken offers a number of capabilities, which briefly are described
