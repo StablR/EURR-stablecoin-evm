@@ -20,7 +20,7 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
-          runs: 10000000,
+          runs: 1000000,
         },
       },
     },
@@ -43,18 +43,21 @@ module.exports = {
     ropsten: {
       provider: infuraProvider("ropsten"),
       network_id: 3,
-      confirmations: 0,    // # of confs to wait between deployments. (default: 0)
-      gas: 5000000,        // Ropsten has a lower block limit than mainnet
-      gasPrice: 40000000000,  // 50 gwei (in wei) (default: 100 gwei)
+      confirmations: 0, // # of confs to wait between deployments. (default: 0)
+      gas: 5000000, // Ropsten has a lower block limit than mainnet
+      gasPrice: 40000000000, // 50 gwei (in wei) (default: 100 gwei)
       networkCheckTimeout: 120000,
-      skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
+      skipDryRun: false, // Skip dry run before migrations? (default: false for public nets )
     },
   },
   mocha: {
     timeout: 60000, // prevents tests from failing when pc is under heavy load
     reporter: "Spec",
   },
-  plugins: ["solidity-coverage"],
+  plugins: ["solidity-coverage", "truffle-plugin-verify"],
+  api_keys: {
+    etherscan: "QEWTQ1JEKQFT7I5E66NVU74D49VUTZH7N4",
+  },
 };
 
 function infuraProvider(network) {
