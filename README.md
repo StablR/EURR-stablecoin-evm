@@ -88,6 +88,7 @@ Once deployed on any of the public networks, use the following commands to verif
 
 #### Examples
 Contract verification can be done with the following command:
+
 ```truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten```
 
 You can optionally provide an explicit address of the contract(s) that you wish to verify.
