@@ -10,8 +10,8 @@ Requirements:
 - Yarn
 
 ```
-$ git clone git@github.com:qredo/stablr-token.git
-$ cd stablr-token
+$ git clone git@github.com:qredo/stablr-tokens.git
+$ cd stablr-tokens
 $ npm i -g yarn       # Install yarn if you don't already have it
 $ yarn install        # Install dependencies
 $ yarn setup          # Setup Git hooks
@@ -83,17 +83,27 @@ Run `yarn migrate --network NETWORK`, where NETWORK is either `mainnet` or
 
 ## Verifcation
 
-### Example 1
+In order to have the contracts verified on Etherscan we rely on the `truffle-plugin-verify`plugin.
+Once deployed on any of the public networks, use the following commands to verify the contracts.
+
+#### Examples
+Contract verification can be done with the following command:
+
 ```truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten```
 
-https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+You can optionally provide an explicit address of the contract(s) that you wish to verify.
+This may be useful when you have deployed multiple instances of the same contract.
+The address is appended with @\<address\> as follows:
 
-### Example 2
-```truffle run verify FiatTokenV2@YOURCONTRACTADDRESS --network ropsten```
+    truffle run verify FiatTokenV2@<address> --network ropsten
+    truffle run verify FiatTokenProxy@<address> --network ropsten
 
-```truffle run verify FiatTokenProxy@YOURCONTRACTADDRESS --network ropsten```
 
-https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS
+#### Register as Proxy
+
+Since the contract proxy structure is based on the [EIP-897 DelegateProxy](https://eips.ethereum.org/EIPS/eip-897) we can
+use the [Etherscan Proxy Verification](https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS) tool to link the proxy with the underlying implementation.
+This action opens access the the Read/Write as Proxy functionality on the etherscan dashboard.
 
 ## Contracts
 
