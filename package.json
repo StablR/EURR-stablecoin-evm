@@ -1,5 +1,5 @@
 {
-  "name": "stablr-token",
+  "name": "stablr-tokens",
   "version": "1.0.0",
   "description": "Fiat and non-fiat tokens part of the StablR network.",
   "main": "truffle-config.js",
@@ -23,15 +23,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com//qredo/stablr-token.git"
+    "url": "git+https://github.com//qredo/stablr-tokens.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/qredo/stablr-token/issues"
+    "url": "https://github.com/qredo/stablr-tokens/issues"
   },
-  "homepage": "https://github.com/qredo/stablr-token#readme",
+  "homepage": "https://github.com/qredo/stablr-tokens#readme",
   "dependencies": {
     "truffle-plugin-verify": "^0.5.21"
   },
