@@ -11,16 +11,16 @@ contract("FiatTokenV2_1", (accounts) => {
   beforeEach(async () => {
     fiatToken = await FiatTokenV2_1.new();
     await fiatToken.initialize(
-      "USD Coin",
-      "USDR",
-      "USD",
+      "EUR Coin",
+      "EURR",
+      "EUR",
       6,
       fiatTokenOwner,
       fiatTokenOwner,
       fiatTokenOwner,
       fiatTokenOwner
     );
-    await fiatToken.initializeV2("USD Coin", { from: fiatTokenOwner });
+    await fiatToken.initializeV2("EUR Coin", { from: fiatTokenOwner });
   });
 
   behavesLikeFiatTokenV2(accounts, () => fiatToken, fiatTokenOwner);

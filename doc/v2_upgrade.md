@@ -32,7 +32,7 @@
    contract address by calling `changeAdmin(address)` method on the
    `FiatTokenProxy` contract.
 
-5. Send 0.20 USD to the `V2Upgrader` contract address. (200,000 tokens)
+5. Send 0.20 EUR to the `V2Upgrader` contract address. (200,000 tokens)
 
 6. Using the Deployer Key, call `upgrade()` (`0xd55ec697`) method on the
    `V2Upgrader`.

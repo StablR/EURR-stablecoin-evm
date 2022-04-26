@@ -15,9 +15,9 @@ const BLACKLISTER = "0x063d13783a0a2ce65b1ca00d9e897e6c8b1ec86b";
 // If replacing with real minters need to modify printMinterInfo
 const minters = ["0x0000", "0x0001"];
 
-const NAME = "StablR USD";
-const SYMBOL = "USDR";
-const CURRENCY = "USD";
+const NAME = "StablR EUR";
+const SYMBOL = "EURR";
+const CURRENCY = "EUR";
 const DECIMALS = 6;
 const TOTALSUPPLY = 0;
 const PAUSED = false;

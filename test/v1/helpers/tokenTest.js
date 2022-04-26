@@ -15,8 +15,8 @@ const UpgradedFiatTokenNewFieldsNewLogic = artifacts.require(
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const name = "Sample Fiat Token";
-const symbol = "C-USD";
-const currency = "USD";
+const symbol = "R-EUR";
+const currency = "EUR";
 const decimals = 2;
 const trueInStorageFormat = "0x01";
 const bigZero = new BN(0);
