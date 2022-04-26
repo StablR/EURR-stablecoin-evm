@@ -34,7 +34,7 @@ import { V2UpgraderHelper } from "./V2UpgraderHelper.sol";
 
 /**
  * @title V2 Upgrader
- * @notice Performs USDR v2 upgrade, and runs a basic sanity test in a single
+ * @notice Performs EURR v2 upgrade, and runs a basic sanity test in a single
  * atomic transaction, rolling back if any issues are found. This may be
  * overkill, but the peace of mind is worth the gas spent. By performing the
  * upgrade atomically, it ensures that there is no disruption of service if the
@@ -55,7 +55,7 @@ contract V2Upgrader is Ownable {
      * @param proxy             FiatTokenProxy contract
      * @param implementation    FiatTokenV2 implementation contract
      * @param newProxyAdmin     Grantee of proxy admin role after upgrade
-     * @param newName           New ERC20 name (e.g. "USD//C" -> "USD Coin")
+     * @param newName           New ERC20 name (e.g. "EUR//R" -> "EUR Coin")
      */
     constructor(
         FiatTokenProxy proxy,
@@ -123,7 +123,7 @@ contract V2Upgrader is Ownable {
 
         // Check that this contract sufficient funds to run the tests
         uint256 contractBal = _helper.balanceOf(address(this));
-        require(contractBal >= 2e5, "V2Upgrader: 0.2 USDR needed");
+        require(contractBal >= 2e5, "V2Upgrader: 0.2 EURR needed");
 
         uint256 callerBal = _helper.balanceOf(msg.sender);
 
@@ -185,8 +185,8 @@ contract V2Upgrader is Ownable {
             "V2Upgrader: approve/transferFrom test failed"
         );
 
-        // Transfer any remaining USDR to the caller
-        withdrawUSDR();
+        // Transfer any remaining ERUR to the caller
+        withdrawEURR();
 
         // Tear down
         _helper.tearDown();
@@ -194,15 +194,15 @@ contract V2Upgrader is Ownable {
     }
 
     /**
-     * @notice Withdraw any USDR in the contract
+     * @notice Withdraw any EURR in the contract
      */
-    function withdrawUSDR() public onlyOwner {
-        IERC20 usdr = IERC20(address(_proxy));
-        uint256 balance = usdr.balanceOf(address(this));
+    function withdrawEURR() public onlyOwner {
+        IERC20 eurr = IERC20(address(_proxy));
+        uint256 balance = eurr.balanceOf(address(this));
         if (balance > 0) {
             require(
-                usdr.transfer(msg.sender, balance),
-                "V2Upgrader: failed to withdraw USDR"
+                eurr.transfer(msg.sender, balance),
+                "V2Upgrader: failed to withdraw EURR"
             );
         }
     }

@@ -72,9 +72,9 @@ available, but can only be called once per proxy.
 
    ```
    initialize(
-          "USD//R",
-          "USDR",
-          "USD",
+          "EUR//R",
+          "EURR",
+          "EUR",
           6,
           masterMinterAddress,
           pauserAddress,

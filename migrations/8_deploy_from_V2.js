@@ -88,15 +88,15 @@ module.exports = async (deployer, network) => {
     // proxy will forward all the calls to the FiatTokenV2 impl
     const proxyAsV2 = await FiatTokenV2.at(FiatTokenProxy.address);
     await proxyAsV2.initialize(
-      "StablR USD",
-      "USDR",
-      "USD",
+      "StablR EUR",
+      "EURR",
+      "EUR",
       6,
       masterMinterAddress,
       pauserAddress,
       blacklisterAddress,
       ownerAddress
     );
-    await proxyAsV2.initializeV2("StablR USD");
+    await proxyAsV2.initializeV2("StablR EUR");
   }
 };
