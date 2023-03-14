@@ -25,7 +25,7 @@ if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
 }
 
 module.exports = async (deployer, network) => {
-  if (some(["ropsten", "mainnet"], (v) => network.includes(v))) {
+  if (some(["goerli", "mainnet"], (v) => network.includes(v))) {
     if (some(["development", "coverage"], (v) => network.includes(v))) {
       // DO NOT USE THESE ADDRESSES IN PRODUCTION - these are the deterministic
       // addresses from ganache, so the private keys are well known and match the
@@ -88,7 +88,7 @@ module.exports = async (deployer, network) => {
     // proxy will forward all the calls to the FiatTokenV2 impl
     const proxyAsV2 = await FiatTokenV2.at(FiatTokenProxy.address);
     await proxyAsV2.initialize(
-      "StablR EUR",
+      "StablR Euro",
       "EURR",
       "EUR",
       6,
@@ -97,6 +97,6 @@ module.exports = async (deployer, network) => {
       blacklisterAddress,
       ownerAddress
     );
-    await proxyAsV2.initializeV2("StablR EUR");
+    await proxyAsV2.initializeV2("StablR Euro");
   }
 };

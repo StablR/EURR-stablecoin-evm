@@ -39,6 +39,11 @@ module.exports = {
     mainnet: {
       provider: infuraProvider("mainnet"),
       network_id: 1,
+      confirmations: 1, // # of confs to wait between deployments. (default: 0)
+      gas: 5000000, // Ropsten has a lower block limit than mainnet
+      gasPrice: 30000000000, // 50 gwei (in wei) (default: 100 gwei)
+      networkCheckTimeout: 120000,
+      skipDryRun: false, // Skip dry run before migrations? (default: false for public nets )
     },
     ropsten: {
       provider: infuraProvider("ropsten"),
@@ -46,6 +51,15 @@ module.exports = {
       confirmations: 0, // # of confs to wait between deployments. (default: 0)
       gas: 5000000, // Ropsten has a lower block limit than mainnet
       gasPrice: 40000000000, // 50 gwei (in wei) (default: 100 gwei)
+      networkCheckTimeout: 120000,
+      skipDryRun: false, // Skip dry run before migrations? (default: false for public nets )
+    },
+    goerli:{
+      provider: infuraProvider("goerli"),
+      network_id: 5,
+      confirmations: 1, // # of confs to wait between deployments. (default: 0)
+      gas: 5000000, // Ropsten has a lower block limit than mainnet
+      gasPrice: 160000000000, // 50 gwei (in wei) (default: 100 gwei)
       networkCheckTimeout: 120000,
       skipDryRun: false, // Skip dry run before migrations? (default: false for public nets )
     },
