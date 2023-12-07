@@ -40,6 +40,15 @@ module.exports = {
       provider: infuraProvider("mainnet"),
       network_id: 1,
     },
+    sepolia: {
+      provider: infuraProvider("sepolia"),
+      network_id: 11155111, // Sepolia's network ID
+      gas: 5000000, // Sepolia has a lower block limit than mainnet
+      gasPrice: 40000000000, // 50 gwei (in wei) (default: 100 gwei)
+      confirmations: 2, // Set the number of confirmations needed for a transaction
+      timeoutBlocks: 200, // Set the timeout for transactions
+      skipDryRun: false, // Skip the dry run option
+    },
     ropsten: {
       provider: infuraProvider("ropsten"),
       network_id: 3,
