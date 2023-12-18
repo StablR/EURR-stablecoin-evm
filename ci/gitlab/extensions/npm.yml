@@ -1,0 +1,24 @@
+.cache:build:yarn:
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+    policy: push
+    unprotect: true
+
+.cache:pull:yarn:
+  extends:
+    - .cache:build:yarn
+  cache:
+    policy: pull
+
+.contracts:lint:
+  image: $NODE_IMAGE
+  extends:
+    - .cache:pull:yarn
+  before_script:
+    - yarn --immutable
+  script:
+    - yarn lint

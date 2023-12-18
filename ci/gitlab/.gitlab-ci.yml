@@ -1,0 +1,48 @@
+stages:
+  - test
+  - deploy
+  - verify
+
+default:
+  tags:
+    - saas-linux-small-amd64
+
+include:
+  - .ci/pipelines/contracts.yml
+  - .ci/pipelines/extensions/npm.yml
+
+variables:
+  NODE_IMAGE: node:20.10.0-alpine
+  AWS_IMAGE: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  YARN_CACHE_FOLDER: .yarn
+  MNEMONIC:
+    description: "The BIP39 Mnemonic Phrase"
+  INFURA_KEY:
+    description: "Infura Access Key"
+  APPEND_NAME:
+    value: "Bin"
+    description: "Append the token name (Used to indentify test contract)"
+  APPEND_TICKER:
+    value: "BIN"
+    description: "Append the token ticker (Used to indentify test contract)"
+  NETWORK:
+    value: "sepolia"
+    description: "Network"
+    options:
+      - "sepolia"
+      - "goerli"
+  GAS_PRICE_GWEI:
+    value: 50
+    description: "Gas price in GWEI (check https://etherscan.io/gastracker, currently not available for testnets)"
+  PROXY_ADMIN_ADDRESS:
+    description: "Proxy Admin Address"
+  OWNER_ADDRESS:
+    description: "Owner Address"
+  MASTERMINTER_ADDRESS:
+    description: "MasterMinter Address"
+  PAUSER_ADDRESS:
+    description: "Pauser Address"
+  BLACKLISTER_ADDRESS:
+    description: "Blacklister Address"
+  LOST_AND_FOUND_ADDRESS:
+    description: "Lost and Found Address"

@@ -1,0 +1,50 @@
+cache:build:
+  stage: .pre
+  image: $NODE_IMAGE
+  rules:
+    - changes:
+        paths:
+          - yarn.lock
+  extends:
+    - .cache:build:yarn
+  script:
+    - yarn --immutable
+
+contracts:lint:
+  stage: test
+  extends:
+    - .contracts:lint
+  when: manual
+
+contracts:deploy:
+  stage: deploy
+  image: $NODE_IMAGE
+  extends:
+    - .cache:pull:yarn
+  before_script:
+    - yarn --immutable
+  script:
+    - yarn rm:extra-migrations
+    - yarn migrate --network ${NETWORK}
+  artifacts:
+    paths:
+      - build/contracts/*
+      - coverage/**/*
+  when: manual
+
+contracts:verify:
+  stage: verify
+  image: $NODE_IMAGE
+  dependencies:
+    - contracts:deploy
+  extends:
+    - .cache:pull:yarn
+  before_script:
+    - yarn --immutable
+  script:
+    - yarn verify --network ${NETWORK}
+  artifacts:
+    paths:
+      - build/contracts/*
+      - coverage/**/*
+  when: manual

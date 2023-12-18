@@ -1,17 +1,14 @@
-const fs = require("fs");
-const path = require("path");
+require("dotenv").config();
 const MasterMinter = artifacts.require("MasterMinter.sol");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy.sol");
-let masterMinterAddress = "";
-let fiatTokenAddress = "";
 
-// Read config file if it exists
-if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
-  ({
-    MASTERMINTER_ADDRESS: masterMinterAddress,
-    PROXY_CONTRACT_ADDRESS: fiatTokenAddress,
-  } = require("../config.js"));
-}
+const {
+  MASTERMINTER_ADDRESS = "",
+  PROXY_CONTRACT_ADDRESS = ""
+} = process.env;
+
+let masterMinterAddress = MASTERMINTER_ADDRESS;
+let fiatTokenAddress = PROXY_CONTRACT_ADDRESS;
 
 module.exports = function (deployer, network) {
   if (network === "development" || network === "coverage") {

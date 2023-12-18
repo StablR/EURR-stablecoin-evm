@@ -1,6 +1,8 @@
 # StablR Token
 
-This repository is based on the [CENTRE](https://centre.io) Token repository taken from the following [commit](https://github.com/centrehq/centre-tokens/commit/0d3cab14ebd133a83fc834dbd48d0468bdf0b391).
+This repository is based on the [CENTRE](https://centre.io) Token repository
+taken from the following
+[commit](https://github.com/centrehq/centre-tokens/commit/0d3cab14ebd133a83fc834dbd48d0468bdf0b391).
 
 ## Setup
 
@@ -72,38 +74,41 @@ $ yarn coverage
 
 ## Deployment
 
-Populate (create if missing) the `config.js` configuration file. Enter
-the BIP39 mnemonic phrase, the INFURA API key to use for deployment, and the
-addresses of proxy admin, owner, master minter, blacklister, and pauser in
-`config.js`. This file must not be checked into the repository. To prevent
-accidental check-ins, `config.js` is in `.gitignore`.
+Populate (create if missing) the `.env` configuration file. Enter the BIP39
+mnemonic phrase, the INFURA API key to use for deployment, and the addresses of
+proxy admin, owner, master minter, blacklister, and pauser in `.env`. This file
+must not be checked into the repository. To prevent accidental check-ins, `.env`
+is in `.gitignore`.
 
 Run `yarn migrate --network NETWORK`, where NETWORK is either `mainnet` or
 `ropsten`.
 
 ## Verifcation
 
-In order to have the contracts verified on Etherscan we rely on the `truffle-plugin-verify`plugin.
-Once deployed on any of the public networks, use the following commands to verify the contracts.
+In order to have the contracts verified on Etherscan we rely on the
+`truffle-plugin-verify`plugin. Once deployed on any of the public networks, use
+the following commands to verify the contracts.
 
 #### Examples
+
 Contract verification can be done with the following command:
 
-```truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten```
+`truffle run verify FiatTokenV2 FiatTokenProxy --network ropsten`
 
-You can optionally provide an explicit address of the contract(s) that you wish to verify.
-This may be useful when you have deployed multiple instances of the same contract.
-The address is appended with @\<address\> as follows:
+You can optionally provide an explicit address of the contract(s) that you wish
+to verify. This may be useful when you have deployed multiple instances of the
+same contract. The address is appended with @\<address\> as follows:
 
     truffle run verify FiatTokenV2@<address> --network ropsten
     truffle run verify FiatTokenProxy@<address> --network ropsten
 
-
 #### Register as Proxy
 
-Since the contract proxy structure is based on the [EIP-897 DelegateProxy](https://eips.ethereum.org/EIPS/eip-897) we can
-use the [Etherscan Proxy Verification](https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS) tool to link the proxy with the underlying implementation.
-This action opens access the the Read/Write as Proxy functionality on the etherscan dashboard.
+Since the contract proxy structure is based on the
+[EIP-897 DelegateProxy](https://eips.ethereum.org/EIPS/eip-897) we can use the
+[Etherscan Proxy Verification](https://ropsten.etherscan.io/proxyContractChecker?a=YOURCONTRACTADDRESS)
+tool to link the proxy with the underlying implementation. This action opens
+access the the Read/Write as Proxy functionality on the etherscan dashboard.
 
 ## Contracts
 

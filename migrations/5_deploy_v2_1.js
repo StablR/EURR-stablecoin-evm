@@ -1,5 +1,4 @@
-const fs = require("fs");
-const path = require("path");
+require("dotenv").config();
 const some = require("lodash/some");
 
 const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
@@ -7,12 +6,11 @@ const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
 
-let proxyContractAddress = "";
+const {
+  PROXY_CONTRACT_ADDRESS = "",
+} = process.env;
 
-// Read config file if it exists
-if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
-  ({ PROXY_CONTRACT_ADDRESS: proxyContractAddress } = require("../config.js"));
-}
+let proxyContractAddress = PROXY_CONTRACT_ADDRESS;
 
 module.exports = async (deployer, network) => {
   if (
