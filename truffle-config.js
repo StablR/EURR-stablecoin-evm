@@ -8,7 +8,7 @@ Object.defineProperty(Error, "prepareStackTrace", { writable: false });
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 // Read config file if it exists
-const { MNEMONIC, INFURA_KEY, GAS_PRICE_GWEI } = process.env;
+const { MNEMONIC, INFURA_KEY, GAS_PRICE_GWEI, ETHERSCAN_API_KEY } = process.env;
 
 module.exports = {
   compilers: {
@@ -62,7 +62,7 @@ module.exports = {
   },
   plugins: ["solidity-coverage", "truffle-plugin-verify"],
   api_keys: {
-    etherscan: "QEWTQ1JEKQFT7I5E66NVU74D49VUTZH7N4",
+    etherscan: ETHERSCAN_API_KEY,
   },
 };
 
