@@ -19,7 +19,9 @@
     "solhint": "solhint 'contracts/**/*.sol'",
     "precommit": "yarn typechain && yarn fmt && yarn typecheck && yarn lint && yarn solhint",
     "slither": "slither --solc-disable-warnings --disable-color --exclude-dependencies .",
-    "migrate": "truffle migrate --interactive"
+    "migrate": "truffle migrate",
+    "rm:extra-migrations": "sh scripts/remove-extra-migrations.sh",
+    "verify": "truffle run verify FiatTokenV2 FiatTokenProxy"
   },
   "repository": {
     "type": "git",
@@ -47,6 +49,7 @@
     "assert-diff": "1.2.6",
     "chai": "^4.2.0",
     "diff": "^4.0.2",
+    "dotenv": "^16.3.1",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",

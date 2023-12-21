@@ -1,17 +1,14 @@
 process.env.TS_NODE_FILES = "true";
+
+require("dotenv").config();
 require("ts-node/register/transpile-only");
 // Fix Typescript callsite reporting
 Object.defineProperty(Error, "prepareStackTrace", { writable: false });
 
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const fs = require("fs");
-const path = require("path");
 
 // Read config file if it exists
-let config = { MNEMONIC: "", INFURA_KEY: "" };
-if (fs.existsSync(path.join(__dirname, "config.js"))) {
-  config = require("./config.js");
-}
+const { MNEMONIC, INFURA_KEY, GAS_PRICE_GWEI, ETHERSCAN_API_KEY } = process.env;
 
 module.exports = {
   compilers: {
@@ -40,12 +37,21 @@ module.exports = {
       provider: infuraProvider("mainnet"),
       network_id: 1,
     },
+    sepolia: {
+      provider: infuraProvider("sepolia"),
+      network_id: 11155111, // Sepolia's network ID
+      gas: 10000000,
+      gasPrice: (GAS_PRICE_GWEI ?? 50) * 1000000000, // default: 50 gwei (in wei)
+      confirmations: 2, // Set the number of confirmations needed for a transaction
+      timeoutBlocks: 200, // Set the timeout for transactions
+      skipDryRun: false, // Skip the dry run option
+    },
     ropsten: {
       provider: infuraProvider("ropsten"),
       network_id: 3,
       confirmations: 0, // # of confs to wait between deployments. (default: 0)
       gas: 5000000, // Ropsten has a lower block limit than mainnet
-      gasPrice: 40000000000, // 50 gwei (in wei) (default: 100 gwei)
+      gasPrice: (GAS_PRICE_GWEI ?? 50) * 1000000000, // default: 50 gwei (in wei)
       networkCheckTimeout: 120000,
       skipDryRun: false, // Skip dry run before migrations? (default: false for public nets )
     },
@@ -56,23 +62,23 @@ module.exports = {
   },
   plugins: ["solidity-coverage", "truffle-plugin-verify"],
   api_keys: {
-    etherscan: "QEWTQ1JEKQFT7I5E66NVU74D49VUTZH7N4",
+    etherscan: ETHERSCAN_API_KEY,
   },
 };
 
 function infuraProvider(network) {
   return () => {
-    if (!config.MNEMONIC) {
-      console.error("A valid MNEMONIC must be provided in config.js");
+    if (!MNEMONIC) {
+      console.error("A valid MNEMONIC must be provided in env variables");
       process.exit(1);
     }
-    if (!config.INFURA_KEY) {
-      console.error("A valid INFURA_KEY must be provided in config.js");
+    if (!INFURA_KEY) {
+      console.error("A valid INFURA_KEY must be provided in env variables");
       process.exit(1);
     }
     return new HDWalletProvider(
-      config.MNEMONIC,
-      `https://${network}.infura.io/v3/${config.INFURA_KEY}`
+      MNEMONIC,
+      `https://${network}.infura.io/v3/${INFURA_KEY}`
     );
   };
 }

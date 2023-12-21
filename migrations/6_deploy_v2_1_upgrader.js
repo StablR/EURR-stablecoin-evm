@@ -1,23 +1,19 @@
-const fs = require("fs");
-const path = require("path");
+require("dotenv").config();
 const some = require("lodash/some");
 
 const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 const V2_1Upgrader = artifacts.require("V2_1Upgrader");
 
-let proxyAdminAddress = "";
-let proxyContractAddress = "";
-let lostAndFoundAddress = "";
+const {
+  PROXY_ADMIN_ADDRESS = "",
+  PROXY_CONTRACT_ADDRESS = "",
+  LOST_AND_FOUND_ADDRESS = "",
+} = process.env;
 
-// Read config file if it exists
-if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
-  ({
-    PROXY_ADMIN_ADDRESS: proxyAdminAddress,
-    PROXY_CONTRACT_ADDRESS: proxyContractAddress,
-    LOST_AND_FOUND_ADDRESS: lostAndFoundAddress,
-  } = require("../config.js"));
-}
+let proxyAdminAddress = PROXY_ADMIN_ADDRESS;
+let proxyContractAddress = PROXY_CONTRACT_ADDRESS;
+let lostAndFoundAddress = LOST_AND_FOUND_ADDRESS;
 
 module.exports = async (deployer, network) => {
   if (some(["development", "coverage"], (v) => network.includes(v))) {

@@ -1,5 +1,4 @@
-const fs = require("fs");
-const path = require("path");
+require("dotenv").config();
 const some = require("lodash/some");
 
 const FiatTokenV1 = artifacts.require("FiatTokenV1");
@@ -7,22 +6,19 @@ const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
 
-let proxyAdminAddress = "";
-let ownerAddress = "";
-let masterMinterAddress = "";
-let pauserAddress = "";
-let blacklisterAddress = "";
+const {
+  PROXY_ADMIN_ADDRESS = "",
+  OWNER_ADDRESS = "",
+  MASTERMINTER_ADDRESS = "",
+  PAUSER_ADDRESS = "",
+  BLACKLISTER_ADDRESS = "",
+} = process.env;
 
-// Read config file if it exists
-if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
-  ({
-    PROXY_ADMIN_ADDRESS: proxyAdminAddress,
-    OWNER_ADDRESS: ownerAddress,
-    MASTERMINTER_ADDRESS: masterMinterAddress,
-    PAUSER_ADDRESS: pauserAddress,
-    BLACKLISTER_ADDRESS: blacklisterAddress,
-  } = require("../config.js"));
-}
+let proxyAdminAddress = PROXY_ADMIN_ADDRESS;
+let ownerAddress = OWNER_ADDRESS;
+let masterMinterAddress = MASTERMINTER_ADDRESS;
+let pauserAddress = PAUSER_ADDRESS;
+let blacklisterAddress = BLACKLISTER_ADDRESS;
 
 module.exports = async (deployer, network) => {
   if (some(["development", "coverage"], (v) => network.includes(v))) {
