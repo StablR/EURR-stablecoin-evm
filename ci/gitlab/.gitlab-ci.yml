@@ -8,8 +8,8 @@ default:
     - saas-linux-small-amd64
 
 include:
-  - .ci/pipelines/contracts.yml
-  - .ci/pipelines/extensions/npm.yml
+  - ci/gitlab/contracts.yml
+  - ci/gitlab/extensions/npm.yml
 
 variables:
   NODE_IMAGE: node:20.10.0-alpine
