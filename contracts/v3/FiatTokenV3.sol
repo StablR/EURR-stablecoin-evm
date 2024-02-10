@@ -39,13 +39,8 @@ contract FiatTokenV3 is FiatTokenV2 {
      */
     function initializeV3() external {
         // solhint-disable-next-line reason-string
-        require(_initializedVersion == 2);
-
-        // uint256 lockedAmount = balances[address(this)];
-        // if (lockedAmount > 0) {
-        //     _transfer(address(this), lostAndFound, lockedAmount);
-        // }
-        // blacklisted[address(this)] = true;
+        require(initialized && _initializedVersion == 2);
+        DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(name, "3");
 
         _initializedVersion = 3;
     }
