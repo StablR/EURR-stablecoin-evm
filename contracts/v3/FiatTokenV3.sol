@@ -26,6 +26,7 @@
 pragma solidity 0.6.12;
 
 import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
+import { EIP712 } from "../util/EIP712.sol";
 
 // solhint-disable func-name-mixedcase
 
