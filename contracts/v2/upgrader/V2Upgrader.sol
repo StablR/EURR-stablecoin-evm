@@ -52,22 +52,22 @@ contract V2Upgrader is Ownable {
 
     /**
      * @notice Constructor
-     * @param proxy             FiatTokenProxy contract
-     * @param implementation    FiatTokenV2 implementation contract
-     * @param newProxyAdmin     Grantee of proxy admin role after upgrade
-     * @param newName           New ERC20 name (e.g. "EUR//R" -> "EUR Coin")
+     * @param proxyAddr          FiatTokenProxy contract
+     * @param implementationAddr FiatTokenV2 implementation contract
+     * @param newProxyAdminAddr  Grantee of proxy admin role after upgrade
+     * @param newNameValue       New ERC20 name (e.g. "EUR//R" -> "EUR Coin")
      */
     constructor(
-        FiatTokenProxy proxy,
-        FiatTokenV2 implementation,
-        address newProxyAdmin,
-        string memory newName
+        FiatTokenProxy proxyAddr,
+        FiatTokenV2 implementationAddr,
+        address newProxyAdminAddr,
+        string memory newNameValue
     ) public Ownable() {
-        _proxy = proxy;
-        _implementation = implementation;
-        _newProxyAdmin = newProxyAdmin;
-        _newName = newName;
-        _helper = new V2UpgraderHelper(address(proxy));
+        _proxy = proxyAddr;
+        _implementation = implementationAddr;
+        _newProxyAdmin = newProxyAdminAddr;
+        _newName = newNameValue;
+        _helper = new V2UpgraderHelper(address(proxyAddr));
     }
 
     /**
@@ -132,7 +132,7 @@ contract V2Upgrader is Ownable {
         uint8 decimals = _helper.decimals();
         string memory currency = _helper.currency();
         address masterMinter = _helper.masterMinter();
-        address owner = _helper.fiatTokenOwner();
+        address ownerAddr = _helper.fiatTokenOwner();
         address pauser = _helper.pauser();
         address blacklister = _helper.blacklister();
 
@@ -154,7 +154,7 @@ contract V2Upgrader is Ownable {
                 decimals == v2.decimals() &&
                 keccak256(bytes(currency)) == keccak256(bytes(v2.currency())) &&
                 masterMinter == v2.masterMinter() &&
-                owner == v2.owner() &&
+                ownerAddr == v2.owner() &&
                 pauser == v2.pauser() &&
                 blacklister == v2.blacklister(),
             "V2Upgrader: metadata test failed"

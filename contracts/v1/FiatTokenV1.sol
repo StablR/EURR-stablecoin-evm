@@ -166,17 +166,17 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
     /**
      * @notice Amount of remaining tokens spender is allowed to transfer on
      * behalf of the token owner
-     * @param owner     Token owner's address
+     * @param ownerAddr Token owner's address
      * @param spender   Spender's address
      * @return Allowance amount
      */
-    function allowance(address owner, address spender)
+    function allowance(address ownerAddr, address spender)
         external
         override
         view
         returns (uint256)
     {
-        return allowed[owner][spender];
+        return allowed[ownerAddr][spender];
     }
 
     /**
@@ -220,19 +220,22 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
 
     /**
      * @dev Internal function to set allowance
-     * @param owner     Token owner's address
+     * @param ownerAddr Token owner's address
      * @param spender   Spender's address
      * @param value     Allowance amount
      */
     function _approve(
-        address owner,
+        address ownerAddr,
         address spender,
         uint256 value
     ) internal override {
-        require(owner != address(0), "ERC20: approve from the zero address");
+        require(
+            ownerAddr != address(0),
+            "ERC20: approve from the zero address"
+        );
         require(spender != address(0), "ERC20: approve to the zero address");
-        allowed[owner][spender] = value;
-        emit Approval(owner, spender, value);
+        allowed[ownerAddr][spender] = value;
+        emit Approval(ownerAddr, spender, value);
     }
 
     /**

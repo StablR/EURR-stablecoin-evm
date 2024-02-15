@@ -180,7 +180,7 @@ contract FiatTokenV2 is FiatTokenV1_1, EIP3009, EIP2612 {
 
     /**
      * @notice Update allowance with a signed permit
-     * @param owner       Token owner's address (Authorizer)
+     * @param ownerAddr   Token owner's address (Authorizer)
      * @param spender     Spender's address
      * @param value       Amount of allowance
      * @param deadline    Expiration time, seconds since the epoch
@@ -189,46 +189,50 @@ contract FiatTokenV2 is FiatTokenV1_1, EIP3009, EIP2612 {
      * @param s           s of the signature
      */
     function permit(
-        address owner,
+        address ownerAddr,
         address spender,
         uint256 value,
         uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external whenNotPaused notBlacklisted(owner) notBlacklisted(spender) {
-        _permit(owner, spender, value, deadline, v, r, s);
+    ) external whenNotPaused notBlacklisted(ownerAddr) notBlacklisted(spender) {
+        _permit(ownerAddr, spender, value, deadline, v, r, s);
     }
 
     /**
      * @notice Internal function to increase the allowance by a given increment
-     * @param owner     Token owner's address
+     * @param ownerAddr Token owner's address
      * @param spender   Spender's address
      * @param increment Amount of increase
      */
     function _increaseAllowance(
-        address owner,
+        address ownerAddr,
         address spender,
         uint256 increment
     ) internal override {
-        _approve(owner, spender, allowed[owner][spender].add(increment));
+        _approve(
+            ownerAddr,
+            spender,
+            allowed[ownerAddr][spender].add(increment)
+        );
     }
 
     /**
      * @notice Internal function to decrease the allowance by a given decrement
-     * @param owner     Token owner's address
+     * @param ownerAddr Token owner's address
      * @param spender   Spender's address
      * @param decrement Amount of decrease
      */
     function _decreaseAllowance(
-        address owner,
+        address ownerAddr,
         address spender,
         uint256 decrement
     ) internal override {
         _approve(
-            owner,
+            ownerAddr,
             spender,
-            allowed[owner][spender].sub(
+            allowed[ownerAddr][spender].sub(
                 decrement,
                 "ERC20: decreased allowance below zero"
             )
