@@ -27,6 +27,7 @@ pragma solidity 0.6.12;
 
 import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 import { EIP712 } from "../util/EIP712.sol";
+import { IFiatTokenV3 } from "./IFiatTokenV3.sol";
 
 // solhint-disable func-name-mixedcase
 
@@ -34,7 +35,7 @@ import { EIP712 } from "../util/EIP712.sol";
  * @title FiatToken V3
  * @notice ERC20 Token backed by fiat reserves, version 3
  */
-contract FiatTokenV3 is FiatTokenV2 {
+contract FiatTokenV3 is FiatTokenV2, IFiatTokenV3 {
     /**
      * @notice Initialize v3
      */
@@ -47,10 +48,46 @@ contract FiatTokenV3 is FiatTokenV2 {
     }
 
     /**
+     * @notice Increase the allowance by a given increment
+     * @param spender   Spender's address
+     * @param increment Amount of increase in allowance
+     * @return True if successful
+     */
+    function increaseAllowanceV3(address spender, uint256 increment)
+        external
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        _increaseAllowance(msg.sender, spender, increment);
+        emit IncreaseAllowance(msg.sender, spender, increment);
+        return true;
+    }
+
+    /**
+     * @notice Decrease the allowance by a given decrement
+     * @param spender   Spender's address
+     * @param decrement Amount of decrease in allowance
+     * @return True if successful
+     */
+    function decreaseAllowanceV3(address spender, uint256 decrement)
+        external
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        _decreaseAllowance(msg.sender, spender, decrement);
+        emit DecreaseAllowance(msg.sender, spender, decrement);
+        return true;
+    }
+
+    /**
      * @notice Version string for the EIP712 domain separator
      * @return Version string
      */
-    function version() external view returns (string memory) {
+    function version() external pure returns (string memory) {
         return "3";
     }
 }
