@@ -52,7 +52,14 @@ contract FiatTokenV3 is FiatTokenV2 {
      * @notice Version string for the EIP712 domain separator
      * @return Version string
      */
-    function version() external view returns (string memory) {
+    function version() external virtual pure returns (string memory) {
         return "3";
+    }
+
+    function getChainId() external virtual pure returns (uint256 chainId) {
+        assembly {
+            chainId := chainid()
+        }
+        return chainId;
     }
 }
