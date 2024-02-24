@@ -55,21 +55,4 @@ contract FiatTokenV3 is FiatTokenV2 {
     function version() external view returns (string memory) {
         return "3";
     }
-
-    function permitWithoutDeadline(
-        address ownerAddr,
-        address spender,
-        uint256 value,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    )
-        external
-        virtual
-        whenNotPaused
-        notBlacklisted(ownerAddr)
-        notBlacklisted(spender)
-    {
-        _permit(ownerAddr, spender, value, MAX_INT, v, r, s);
-    }
 }
