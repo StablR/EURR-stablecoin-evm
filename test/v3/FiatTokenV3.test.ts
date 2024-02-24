@@ -5,7 +5,6 @@ import { hasSafeAllowance } from "../v2/safeAllowance.behavior";
 import { hasGasAbstraction } from "../v2/GasAbstraction/GasAbstraction.behavior";
 import { makeDomainSeparator } from "../v2/GasAbstraction/helpers";
 import { expectRevert } from "../helpers";
-import { behavesLikeFiatTokenV2 } from "../v2/FiatTokenV2.test";
 
 const FiatTokenV3 = artifacts.require("FiatTokenV3");
 
@@ -26,9 +25,10 @@ contract("FiatTokenV3", (accounts) => {
       fiatTokenOwner
     );
     await fiatToken.initializeV2("EUR Coin", { from: fiatTokenOwner });
+    await fiatToken.initializeV3({ from: fiatTokenOwner });
   });
 
-  behavesLikeFiatTokenV2(accounts, () => fiatToken, fiatTokenOwner);
+  behavesLikeFiatTokenV3(accounts, () => fiatToken, fiatTokenOwner);
 
   describe("version", () => {
     it("returns the version string", async () => {
@@ -43,7 +43,6 @@ export function behavesLikeFiatTokenV3(
   fiatTokenOwner: string
 ): void {
   let domainSeparator: string;
-  let fiatToken = getFiatToken();
 
   beforeEach(async () => {
     domainSeparator = makeDomainSeparator(
@@ -53,39 +52,29 @@ export function behavesLikeFiatTokenV3(
       getFiatToken().address
     );
   });
-  describe("initializeV3", () => {
-    const [, user, lostAndFound] = accounts;
 
-    beforeEach(async () => {
-      await fiatToken.configureMinter(fiatTokenOwner, 1000000e6, {
-        from: fiatTokenOwner,
-      });
-      await fiatToken.mint(user, 100e6, { from: fiatTokenOwner });
-    });
+  behavesLikeRescuable(getFiatToken as () => RescuableInstance, accounts);
 
-    it("transfers funds to a given address", async () => {
-      // send tokens to the contract address
-      await fiatToken.transfer(fiatToken.address, 100e6, { from: user });
+  usesOriginalStorageSlotPositions({
+    Contract: FiatTokenV3,
+    version: 3,
+    accounts,
+  });
 
-      expect(
-        (await fiatToken.balanceOf(fiatToken.address)).toNumber()
-      ).to.equal(100e6);
+  it("has the expected domain separator", async () => {
+    expect(await getFiatToken().DOMAIN_SEPARATOR()).to.equal(domainSeparator);
+  });
 
-      // initialize v3
-      await fiatToken.initializeV3({ from: fiatTokenOwner });
+  hasSafeAllowance(getFiatToken, fiatTokenOwner, accounts);
 
-      expect(
-        (await fiatToken.balanceOf(fiatToken.address)).toNumber()
-      ).to.equal(0);
+  hasGasAbstraction(
+    getFiatToken,
+    () => domainSeparator,
+    fiatTokenOwner,
+    accounts
+  );
 
-      expect((await fiatToken.balanceOf(lostAndFound)).toNumber()).to.equal(
-        100e6
-      );
-    });
-
-    it("disallows calling initializeV3 twice", async () => {
-      await fiatToken.initializeV3({ from: fiatTokenOwner });
-      await expectRevert(fiatToken.initializeV3({ from: fiatTokenOwner }));
-    });
+  it("disallows calling initializeV3 twice", async () => {
+    await expectRevert(getFiatToken().initializeV3({ from: fiatTokenOwner }));
   });
 }
