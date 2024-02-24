@@ -35,15 +35,17 @@ import { EIP712 } from "../util/EIP712.sol";
  * @notice ERC20 Token backed by fiat reserves, version 3
  */
 contract FiatTokenV3 is FiatTokenV2 {
+    uint256 constant MAX_INT = 2**256 - 1;
+
     /**
      * @notice Initialize v3
      */
     function initializeV3() external {
         // solhint-disable-next-line reason-string
-        require(initialized && _initializedVersion == 2);
+        require(initialized && _initializedVersion == 1);
         DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(name, "3");
 
-        _initializedVersion = 3;
+        _initializedVersion = 2;
     }
 
     /**
@@ -52,5 +54,22 @@ contract FiatTokenV3 is FiatTokenV2 {
      */
     function version() external view returns (string memory) {
         return "3";
+    }
+
+    function permitWithoutDeadline(
+        address ownerAddr,
+        address spender,
+        uint256 value,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    )
+        external
+        virtual
+        whenNotPaused
+        notBlacklisted(ownerAddr)
+        notBlacklisted(spender)
+    {
+        _permit(ownerAddr, spender, value, MAX_INT, v, r, s);
     }
 }
