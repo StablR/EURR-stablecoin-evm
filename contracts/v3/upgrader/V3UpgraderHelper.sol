@@ -143,6 +143,34 @@ contract V3UpgraderHelper is Ownable {
     }
 
     /**
+     * @notice Increase the allowance by a given increment
+     * @param spender   Spender's address
+     * @param increment Amount of increase in allowance
+     * @return True if successful
+     */
+    function increaseAllowance(address spender, uint256 increment)
+        external
+        returns (bool)
+    {
+        FiatTokenV2(_proxy).increaseAllowance(spender, increment);
+        return true;
+    }
+
+    /**
+     * @notice Decrease the allowance by a given decrement
+     * @param spender   Spender's address
+     * @param decrement Amount of decrease in allowance
+     * @return True if successful
+     */
+    function decreaseAllowance(address spender, uint256 decrement)
+        external
+        returns (bool)
+    {
+        FiatTokenV2(_proxy).decreaseAllowance(spender, decrement);
+        return true;
+    }
+
+    /**
      * @notice Tear down the contract (self-destruct)
      */
     function tearDown() external onlyOwner {

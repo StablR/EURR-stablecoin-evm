@@ -67,8 +67,8 @@ available, but can only be called once per proxy.
    it will run in the context of the Proxy contract, so the fields it is
    initializing will be stored in the storage of the Proxy. The values passed
    here are important, especially for the roles that will control the contract.
-   These addresses should be obtained from StablR, and the keys will be
-   stored securely.
+   These addresses should be obtained from StablR, and the keys will be stored
+   securely.
 
    ```
    initialize(

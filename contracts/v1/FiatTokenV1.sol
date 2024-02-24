@@ -113,6 +113,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function mint(address _to, uint256 _amount)
         external
+        virtual
         whenNotPaused
         onlyMinters
         notBlacklisted(msg.sender)
@@ -172,6 +173,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function allowance(address owner, address spender)
         external
+        virtual
         override
         view
         returns (uint256)
@@ -208,6 +210,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function approve(address spender, uint256 value)
         external
+        virtual
         override
         whenNotPaused
         notBlacklisted(msg.sender)
@@ -228,7 +231,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
         address owner,
         address spender,
         uint256 value
-    ) internal override {
+    ) internal virtual override {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
         allowed[owner][spender] = value;
@@ -248,6 +251,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
         uint256 value
     )
         external
+        virtual
         override
         whenNotPaused
         notBlacklisted(msg.sender)
@@ -272,6 +276,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function transfer(address to, uint256 value)
         external
+        virtual
         override
         whenNotPaused
         notBlacklisted(msg.sender)
@@ -292,7 +297,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
         address from,
         address to,
         uint256 value
-    ) internal override {
+    ) internal virtual override {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(
@@ -347,6 +352,7 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function burn(uint256 _amount)
         external
+        virtual
         whenNotPaused
         onlyMinters
         notBlacklisted(msg.sender)
