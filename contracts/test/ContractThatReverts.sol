@@ -32,8 +32,8 @@ pragma solidity 0.6.12;
 contract ContractThatReverts {
     string private _reason;
 
-    function setReason(string calldata reason) external {
-        _reason = reason;
+    function setReason(string calldata reasonValue) external {
+        _reason = reasonValue;
     }
 
     function reason() external view returns (string memory) {

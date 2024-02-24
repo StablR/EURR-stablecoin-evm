@@ -47,22 +47,22 @@ contract V2_1Upgrader is Ownable {
 
     /**
      * @notice Constructor
-     * @param proxy             FiatTokenProxy contract
-     * @param implementation    FiatTokenV2_1 implementation contract
-     * @param newProxyAdmin     Grantee of proxy admin role after upgrade
-     * @param lostAndFound      The address to which the locked funds are sent
+     * @param proxyAddr          FiatTokenProxy contract
+     * @param implementationAddr FiatTokenV2_1 implementation contract
+     * @param newProxyAdminAddr  Grantee of proxy admin role after upgrade
+     * @param lostAndFoundAddr   The address to which the locked funds are sent
      */
     constructor(
-        FiatTokenProxy proxy,
-        FiatTokenV2_1 implementation,
-        address newProxyAdmin,
-        address lostAndFound
+        FiatTokenProxy proxyAddr,
+        FiatTokenV2_1 implementationAddr,
+        address newProxyAdminAddr,
+        address lostAndFoundAddr
     ) public Ownable() {
-        _proxy = proxy;
-        _implementation = implementation;
-        _newProxyAdmin = newProxyAdmin;
-        _lostAndFound = lostAndFound;
-        _helper = new V2UpgraderHelper(address(proxy));
+        _proxy = proxyAddr;
+        _implementation = implementationAddr;
+        _newProxyAdmin = newProxyAdminAddr;
+        _lostAndFound = lostAndFoundAddr;
+        _helper = new V2UpgraderHelper(address(proxyAddr));
     }
 
     /**
@@ -129,7 +129,7 @@ contract V2_1Upgrader is Ownable {
         uint8 decimals = _helper.decimals();
         string memory currency = _helper.currency();
         address masterMinter = _helper.masterMinter();
-        address owner = _helper.fiatTokenOwner();
+        address ownerAddr = _helper.fiatTokenOwner();
         address pauser = _helper.pauser();
         address blacklister = _helper.blacklister();
 
@@ -152,7 +152,7 @@ contract V2_1Upgrader is Ownable {
                 keccak256(bytes(currency)) ==
                 keccak256(bytes(v2_1.currency())) &&
                 masterMinter == v2_1.masterMinter() &&
-                owner == v2_1.owner() &&
+                ownerAddr == v2_1.owner() &&
                 pauser == v2_1.pauser() &&
                 blacklister == v2_1.blacklister(),
             "V2_1Upgrader: metadata test failed"
