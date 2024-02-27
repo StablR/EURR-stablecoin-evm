@@ -53,14 +53,15 @@ contract FiatTokenV3 is FiatTokenV2, IFiatTokenV3 {
      * @param increment Amount of increase in allowance
      * @return True if successful
      */
-    function increaseAllowanceV3(address spender, uint256 increment)
+    function increaseAllowance(address spender, uint256 increment)
         external
+        override
         whenNotPaused
         notBlacklisted(msg.sender)
         notBlacklisted(spender)
         returns (bool)
     {
-        _increaseAllowance(msg.sender, spender, increment);
+        super._increaseAllowance(msg.sender, spender, increment);
         emit IncreaseAllowance(msg.sender, spender, increment);
         return true;
     }
@@ -71,14 +72,15 @@ contract FiatTokenV3 is FiatTokenV2, IFiatTokenV3 {
      * @param decrement Amount of decrease in allowance
      * @return True if successful
      */
-    function decreaseAllowanceV3(address spender, uint256 decrement)
+    function decreaseAllowance(address spender, uint256 decrement)
         external
+        override
         whenNotPaused
         notBlacklisted(msg.sender)
         notBlacklisted(spender)
         returns (bool)
     {
-        _decreaseAllowance(msg.sender, spender, decrement);
+        super._decreaseAllowance(msg.sender, spender, decrement);
         emit DecreaseAllowance(msg.sender, spender, decrement);
         return true;
     }
