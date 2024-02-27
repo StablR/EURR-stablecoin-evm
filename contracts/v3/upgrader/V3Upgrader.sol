@@ -47,7 +47,6 @@ contract V3Upgrader is Ownable {
     FiatTokenProxy private _proxy;
     FiatTokenV3 private _implementation;
     address private _newProxyAdmin;
-    string private _newName;
     V3UpgraderHelper private _helper;
 
     /**
@@ -55,18 +54,15 @@ contract V3Upgrader is Ownable {
      * @param proxy             FiatTokenProxy contract
      * @param implementation    FiatTokenV3 implementation contract
      * @param newProxyAdmin     Grantee of proxy admin role after upgrade
-     * @param newName           New ERC20 name (e.g. "EUR//R" -> "EUR Coin")
      */
     constructor(
         FiatTokenProxy proxy,
         FiatTokenV3 implementation,
-        address newProxyAdmin,
-        string memory newName
+        address newProxyAdmin
     ) public Ownable() {
         _proxy = proxy;
         _implementation = implementation;
         _newProxyAdmin = newProxyAdmin;
-        _newName = newName;
         _helper = new V3UpgraderHelper(address(proxy));
     }
 
@@ -101,14 +97,6 @@ contract V3Upgrader is Ownable {
      */
     function newProxyAdmin() external view returns (address) {
         return _newProxyAdmin;
-    }
-
-    /**
-     * @notice New ERC20 token name
-     * @return New Name
-     */
-    function newName() external view returns (string memory) {
-        return _newName;
     }
 
     /**
@@ -149,8 +137,7 @@ contract V3Upgrader is Ownable {
         // Sanity test
         // Check metadata
         require(
-            keccak256(bytes(_newName)) == keccak256(bytes(v3.name())) &&
-                keccak256(bytes(symbol)) == keccak256(bytes(v3.symbol())) &&
+            keccak256(bytes(symbol)) == keccak256(bytes(v3.symbol())) &&
                 decimals == v3.decimals() &&
                 keccak256(bytes(currency)) == keccak256(bytes(v3.currency())) &&
                 masterMinter == v3.masterMinter() &&

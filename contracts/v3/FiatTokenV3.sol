@@ -27,6 +27,7 @@ pragma solidity 0.6.12;
 
 import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 import { EIP712 } from "../util/EIP712.sol";
+import { AbstractFiatTokenV3 } from "./AbstractFiatTokenV3.sol";
 
 // solhint-disable func-name-mixedcase
 
@@ -34,7 +35,18 @@ import { EIP712 } from "../util/EIP712.sol";
  * @title FiatToken V3
  * @notice ERC20 Token backed by fiat reserves, version 3
  */
-contract FiatTokenV3 is FiatTokenV2 {
+contract FiatTokenV3 is AbstractFiatTokenV3, FiatTokenV2 {
+    event IncreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 incrementedValue
+    );
+    event DecreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 decrementedValue
+    );
+
     /**
      * @notice Initialize v3
      */
@@ -44,6 +56,44 @@ contract FiatTokenV3 is FiatTokenV2 {
         DOMAIN_SEPARATOR = EIP712.makeDomainSeparator(name, "3");
 
         _initializedVersion = 3;
+    }
+
+    /**
+     * @notice Increase the allowance by a given increment
+     * @param spender   Spender's address
+     * @param increment Amount of increase in allowance
+     * @return True if successful
+     */
+    function increaseAllowance(address spender, uint256 increment)
+        external
+        override
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        super._increaseAllowance(msg.sender, spender, increment);
+        emit IncreaseAllowance(msg.sender, spender, increment);
+        return true;
+    }
+
+    /**
+     * @notice Decrease the allowance by a given decrement
+     * @param spender   Spender's address
+     * @param decrement Amount of decrease in allowance
+     * @return True if successful
+     */
+    function decreaseAllowance(address spender, uint256 decrement)
+        external
+        override
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        super._decreaseAllowance(msg.sender, spender, decrement);
+        emit DecreaseAllowance(msg.sender, spender, decrement);
+        return true;
     }
 
     /**
