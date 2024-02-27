@@ -27,7 +27,7 @@ pragma solidity 0.6.12;
 
 import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 import { EIP712 } from "../util/EIP712.sol";
-import { IFiatTokenV3 } from "./IFiatTokenV3.sol";
+import { AbstractFiatTokenV3 } from "./AbstractFiatTokenV3.sol";
 
 // solhint-disable func-name-mixedcase
 
@@ -35,7 +35,18 @@ import { IFiatTokenV3 } from "./IFiatTokenV3.sol";
  * @title FiatToken V3
  * @notice ERC20 Token backed by fiat reserves, version 3
  */
-contract FiatTokenV3 is FiatTokenV2, IFiatTokenV3 {
+contract FiatTokenV3 is AbstractFiatTokenV3, FiatTokenV2 {
+    event IncreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 incrementedValue
+    );
+    event DecreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 decrementedValue
+    );
+
     /**
      * @notice Initialize v3
      */

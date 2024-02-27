@@ -25,15 +25,6 @@
 
 pragma solidity 0.6.12;
 
-interface IFiatTokenV3 {
-    event IncreaseAllowance(
-        address indexed owner,
-        address indexed spender,
-        uint256 incrementedValue
-    );
-    event DecreaseAllowance(
-        address indexed owner,
-        address indexed spender,
-        uint256 decrementedValue
-    );
-}
+import { AbstractFiatTokenV2 } from "../v2/AbstractFiatTokenV2.sol";
+
+abstract contract AbstractFiatTokenV3 is AbstractFiatTokenV2 {}
