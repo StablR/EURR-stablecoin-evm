@@ -6,9 +6,7 @@ const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
 
-const {
-  PROXY_CONTRACT_ADDRESS = "",
-} = process.env;
+const { PROXY_CONTRACT_ADDRESS = "" } = process.env;
 
 let proxyContractAddress = PROXY_CONTRACT_ADDRESS;
 
@@ -41,5 +39,5 @@ module.exports = async (deployer, network) => {
     THROWAWAY_ADDRESS
   );
   await fiatTokenV2_1.initializeV2("");
-  await fiatTokenV2_1.initializeV2_1(THROWAWAY_ADDRESS);
+  await fiatTokenV2_1.initializeV2_1();
 };
