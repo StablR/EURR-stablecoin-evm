@@ -34,19 +34,23 @@ import { FiatTokenV2 } from "./FiatTokenV2.sol";
  * @notice ERC20 Token backed by fiat reserves, version 2.1
  */
 contract FiatTokenV2_1 is FiatTokenV2 {
+    event IncreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 incrementedValue
+    );
+    event DecreaseAllowance(
+        address indexed owner,
+        address indexed spender,
+        uint256 decrementedValue
+    );
+
     /**
      * @notice Initialize v2.1
-     * @param lostAndFound  The address to which the locked funds are sent
      */
-    function initializeV2_1(address lostAndFound) external {
+    function initializeV2_1() external {
         // solhint-disable-next-line reason-string
         require(_initializedVersion == 1);
-
-        uint256 lockedAmount = balances[address(this)];
-        if (lockedAmount > 0) {
-            _transfer(address(this), lostAndFound, lockedAmount);
-        }
-        blacklisted[address(this)] = true;
 
         _initializedVersion = 2;
     }
@@ -55,7 +59,52 @@ contract FiatTokenV2_1 is FiatTokenV2 {
      * @notice Version string for the EIP712 domain separator
      * @return Version string
      */
-    function version() external view returns (string memory) {
+    function version() external pure returns (string memory) {
         return "2";
+    }
+
+    /**
+     * @notice Increase the allowance by a given increment
+     * @param spender   Spender's address
+     * @param increment Amount of increase in allowance
+     * @return True if successful
+     */
+    function increaseAllowance(address spender, uint256 increment)
+        external
+        override
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        super._increaseAllowance(msg.sender, spender, increment);
+        emit IncreaseAllowance(msg.sender, spender, increment);
+        return true;
+    }
+
+    /**
+     * @notice Decrease the allowance by a given decrement
+     * @param spender   Spender's address
+     * @param decrement Amount of decrease in allowance
+     * @return True if successful
+     */
+    function decreaseAllowance(address spender, uint256 decrement)
+        external
+        override
+        whenNotPaused
+        notBlacklisted(msg.sender)
+        notBlacklisted(spender)
+        returns (bool)
+    {
+        super._decreaseAllowance(msg.sender, spender, decrement);
+        emit DecreaseAllowance(msg.sender, spender, decrement);
+        return true;
+    }
+
+    function getChainId() external virtual pure returns (uint256 chainId) {
+        assembly {
+            chainId := chainid()
+        }
+        return chainId;
     }
 }

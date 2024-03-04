@@ -18,6 +18,7 @@ contract("V2_1Upgrader", (accounts) => {
   let v2Implementation: FiatTokenV2Instance;
   let v2_1Implementation: FiatTokenV21Instance;
   let originalProxyAdmin: string;
+  let blacklister: string;
   const [minter, lostAndFound, alice, bob] = accounts.slice(9);
 
   before(async () => {
@@ -27,6 +28,7 @@ contract("V2_1Upgrader", (accounts) => {
     v2Implementation = await FiatTokenV2.deployed();
     v2_1Implementation = await FiatTokenV2_1.deployed();
     originalProxyAdmin = await fiatTokenProxy.admin();
+    blacklister = await proxyAsV2.blacklister();
 
     // Upgrade from v1 to v2
     await fiatTokenProxy.upgradeToAndCall(
@@ -42,6 +44,7 @@ contract("V2_1Upgrader", (accounts) => {
       from: await proxyAsV2.masterMinter(),
     });
     await proxyAsV2.mint(minter, 100e6 + 2e5, { from: minter });
+    await proxyAsV2.blacklist(proxyAsV2_1.address, { from: blacklister });
   });
 
   describe("upgrade", () => {
@@ -57,13 +60,12 @@ contract("V2_1Upgrader", (accounts) => {
       );
       expect(await upgrader.helper()).not.to.be.empty;
       expect(await upgrader.newProxyAdmin()).to.equal(originalProxyAdmin);
-      expect(await upgrader.lostAndFound()).to.equal(lostAndFound);
 
       // Transfer 0.2 EURR to the upgrader contract
       await proxyAsV2.transfer(upgrader.address, 2e5, { from: minter });
 
       // Transfer 100 EURR to the FiatTokenProxy contract
-      await proxyAsV2.transfer(proxyAsV2_1.address, 100e6, { from: minter });
+      // await proxyAsV2.transfer(proxyAsV2_1.address, 100e6, { from: minter });
 
       // Transfer admin role to the contract
       await fiatTokenProxy.changeAdmin(upgrader.address, {
@@ -87,16 +89,6 @@ contract("V2_1Upgrader", (accounts) => {
       ).to.equal(0);
       expect((await proxyAsV2_1.balanceOf(upgraderOwner)).toNumber()).to.equal(
         2e5
-      );
-
-      // the EURR tokens held by the proxy contract are transferred to the lost
-      // and found address
-      expect(
-        (await proxyAsV2_1.balanceOf(proxyAsV2_1.address)).toNumber()
-      ).to.equal(0);
-
-      expect((await proxyAsV2_1.balanceOf(lostAndFound)).toNumber()).to.equal(
-        100e6
       );
 
       // token proxy contract is blacklisted
@@ -143,9 +135,9 @@ contract("V2_1Upgrader", (accounts) => {
 
       // burn works as expected
       await proxyAsV2_1.transfer(minter, 100e6, { from: alice });
-      expect((await proxyAsV2_1.balanceOf(minter)).toNumber()).to.equal(100e6);
+      expect((await proxyAsV2_1.balanceOf(minter)).toNumber()).to.equal(200e6);
       await proxyAsV2_1.burn(100e6, { from: minter });
-      expect((await proxyAsV2_1.balanceOf(minter)).toNumber()).to.equal(0);
+      expect((await proxyAsV2_1.balanceOf(minter)).toNumber()).to.equal(100e6);
 
       await expectRevert(
         proxyAsV2_1.burn(1, { from: alice }),
@@ -164,7 +156,6 @@ contract("V2_1Upgrader", (accounts) => {
         fiatTokenProxy.address,
         fiatTokenV1_1.address, // provide V1.1 implementation instead of V2
         originalProxyAdmin,
-        lostAndFound,
         { from: upgraderOwner }
       );
 
@@ -199,7 +190,6 @@ contract("V2_1Upgrader", (accounts) => {
         fiatTokenProxy.address,
         v2_1Implementation.address,
         originalProxyAdmin,
-        lostAndFound,
         { from: upgraderOwner }
       );
 

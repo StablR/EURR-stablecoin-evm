@@ -42,7 +42,6 @@ contract V2_1Upgrader is Ownable {
     FiatTokenProxy private _proxy;
     FiatTokenV2_1 private _implementation;
     address private _newProxyAdmin;
-    address private _lostAndFound;
     V2UpgraderHelper private _helper;
 
     /**
@@ -50,18 +49,15 @@ contract V2_1Upgrader is Ownable {
      * @param proxyAddr          FiatTokenProxy contract
      * @param implementationAddr FiatTokenV2_1 implementation contract
      * @param newProxyAdminAddr  Grantee of proxy admin role after upgrade
-     * @param lostAndFoundAddr   The address to which the locked funds are sent
      */
     constructor(
         FiatTokenProxy proxyAddr,
         FiatTokenV2_1 implementationAddr,
-        address newProxyAdminAddr,
-        address lostAndFoundAddr
+        address newProxyAdminAddr
     ) public Ownable() {
         _proxy = proxyAddr;
         _implementation = implementationAddr;
         _newProxyAdmin = newProxyAdminAddr;
-        _lostAndFound = lostAndFoundAddr;
         _helper = new V2UpgraderHelper(address(proxyAddr));
     }
 
@@ -99,15 +95,6 @@ contract V2_1Upgrader is Ownable {
     }
 
     /**
-     * @notice The address to which the locked funds will be sent as part of the
-     * initialization process
-     * @return Address
-     */
-    function lostAndFound() external view returns (address) {
-        return _lostAndFound;
-    }
-
-    /**
      * @notice Upgrade, transfer proxy admin role to a given address, run a
      * sanity test, and tear down the upgrader contract, in a single atomic
      * transaction. It rolls back if there is an error.
@@ -141,7 +128,7 @@ contract V2_1Upgrader is Ownable {
 
         // Initialize V2 contract
         FiatTokenV2_1 v2_1 = FiatTokenV2_1(address(_proxy));
-        v2_1.initializeV2_1(_lostAndFound);
+        v2_1.initializeV2_1();
 
         // Sanity test
         // Check metadata
