@@ -1,8 +1,8 @@
-import { FiatTokenV2Instance } from "../../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 import { Signature, ecSign, strip0x } from "../../helpers";
 
 export interface TestParams {
-  getFiatToken: () => FiatTokenV2Instance;
+  getFiatToken: () => AnyFiatTokenV2Instance;
   getDomainSeparator: () => string;
   fiatTokenOwner: string;
   accounts: Truffle.Accounts;

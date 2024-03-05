@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { FiatTokenV2Instance } from "../../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 import {
   AuthorizationUsed,
   Transfer,
@@ -19,7 +19,7 @@ export function testTransferWithAuthorization({
   accounts,
 }: TestParams): void {
   describe("transferWithAuthorization", () => {
-    let fiatToken: FiatTokenV2Instance;
+    let fiatToken: AnyFiatTokenV2Instance;
     let domainSeparator: string;
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];

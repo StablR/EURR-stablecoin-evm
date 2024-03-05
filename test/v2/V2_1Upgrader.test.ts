@@ -19,7 +19,7 @@ contract("V2_1Upgrader", (accounts) => {
   let v2_1Implementation: FiatTokenV21Instance;
   let originalProxyAdmin: string;
   let blacklister: string;
-  const [minter, lostAndFound, alice, bob] = accounts.slice(9);
+  const [minter, alice, bob] = accounts.slice(9);
 
   before(async () => {
     fiatTokenProxy = await FiatTokenProxy.deployed();

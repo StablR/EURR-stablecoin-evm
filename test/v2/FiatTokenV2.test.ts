@@ -1,5 +1,6 @@
 import { behavesLikeRescuable } from "../v1.1/Rescuable.behavior";
 import { FiatTokenV2Instance, RescuableInstance } from "../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../@types/AnyFiatTokenV2Instance";
 import { usesOriginalStorageSlotPositions } from "../helpers/storageSlots.behavior";
 import { hasSafeAllowance } from "./safeAllowance.behavior";
 import { hasGasAbstraction } from "./GasAbstraction/GasAbstraction.behavior";
@@ -32,7 +33,7 @@ contract("FiatTokenV2", (accounts) => {
 
 export function behavesLikeFiatTokenV2(
   accounts: Truffle.Accounts,
-  getFiatToken: () => FiatTokenV2Instance,
+  getFiatToken: () => AnyFiatTokenV2Instance,
   fiatTokenOwner: string
 ): void {
   let domainSeparator: string;
