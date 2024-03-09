@@ -54,7 +54,7 @@ abstract contract EIP2612 is AbstractFiatTokenV2, EIP712Domain {
      * @param owner     Token owner's address (Authorizer)
      * @param spender   Spender's address
      * @param value     Amount of allowance
-     * @param deadline  The time at which this expires (unix time)
+     * @param deadline  The time at which this expires (unix time), or max uint256 value to have no expiration
      * @param v         v of the signature
      * @param r         r of the signature
      * @param s         s of the signature
@@ -68,7 +68,10 @@ abstract contract EIP2612 is AbstractFiatTokenV2, EIP712Domain {
         bytes32 r,
         bytes32 s
     ) internal {
-        require(deadline >= now, "FiatTokenV2: permit is expired");
+        require(
+            deadline == type(uint256).max || deadline >= now,
+            "FiatTokenV2: permit is expired"
+        );
 
         bytes memory data = abi.encode(
             PERMIT_TYPEHASH,
