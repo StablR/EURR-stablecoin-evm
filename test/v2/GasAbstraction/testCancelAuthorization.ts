@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { FiatTokenV2Instance } from "../../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 import { ACCOUNTS_AND_KEYS, MAX_UINT256 } from "../../helpers/constants";
 import { expectRevert, hexStringFromBuffer } from "../../helpers";
 import {
@@ -16,7 +16,7 @@ export function testCancelAuthorization({
   accounts,
 }: TestParams): void {
   describe("cancelAuthorization", () => {
-    let fiatToken: FiatTokenV2Instance;
+    let fiatToken: AnyFiatTokenV2Instance;
     let domainSeparator: string;
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];

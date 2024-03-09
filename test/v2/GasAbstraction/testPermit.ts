@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { FiatTokenV2Instance } from "../../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 import { Approval } from "../../../@types/generated/FiatTokenV2";
 import {
   ACCOUNTS_AND_KEYS,
@@ -21,7 +21,7 @@ export function testPermit({
   accounts,
 }: TestParams): void {
   describe("permit", () => {
-    let fiatToken: FiatTokenV2Instance;
+    let fiatToken: AnyFiatTokenV2Instance;
     let domainSeparator: string;
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];

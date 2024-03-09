@@ -1,8 +1,6 @@
 import crypto from "crypto";
-import {
-  FiatTokenV2Instance,
-  FiatTokenUtilInstance,
-} from "../../../@types/generated";
+import { FiatTokenUtilInstance } from "../../../@types/generated";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 import { ACCOUNTS_AND_KEYS, MAX_UINT256 } from "../../helpers/constants";
 import {
   expectRevert,
@@ -24,7 +22,7 @@ export function testTransferWithMultipleAuthorizations({
   accounts,
 }: TestParams): void {
   describe("transferWithMultipleAuthorizations", () => {
-    let fiatToken: FiatTokenV2Instance;
+    let fiatToken: AnyFiatTokenV2Instance;
     let fiatTokenUtil: FiatTokenUtilInstance;
     let domainSeparator: string;
     const [alice, bob] = ACCOUNTS_AND_KEYS;
