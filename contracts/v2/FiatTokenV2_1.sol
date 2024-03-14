@@ -45,6 +45,9 @@ contract FiatTokenV2_1 is FiatTokenV2 {
         uint256 decrementedValue
     );
 
+    event IncreaseMinterAllowance(address indexed minter, uint256 increment);
+    event DecreaseMinterAllowance(address indexed minter, uint256 decrement);
+
     /**
      * @notice Initialize v2.1
      */
@@ -98,6 +101,57 @@ contract FiatTokenV2_1 is FiatTokenV2 {
     {
         super._decreaseAllowance(msg.sender, spender, decrement);
         emit DecreaseAllowance(msg.sender, spender, decrement);
+        return true;
+    }
+
+    /**
+     * @notice Increase the Minter's allowance by a given increment
+     * @param minter    Minter's address
+     * @param increment Amount of increase in allowance
+     * @return True if successful
+     */
+    function increaseMinterAllowance(address minter, uint256 increment)
+        external
+        virtual
+        whenNotPaused
+        onlyMasterMinter
+        notBlacklisted(msg.sender)
+        notBlacklisted(minter)
+        returns (bool)
+    {
+        require(minters[minter], "address not a minter");
+
+        minterAllowed[minter] = minterAllowed[minter].add(increment);
+
+        emit IncreaseMinterAllowance(minter, increment);
+
+        return true;
+    }
+
+    /**
+     * @notice Decrease the Minter's allowance by a given increment
+     * @param minter    Minter's address
+     * @param decrement Amount of decrease in allowance
+     * @return True if successful
+     */
+    function decreaseMinterAllowance(address minter, uint256 decrement)
+        external
+        virtual
+        whenNotPaused
+        onlyMasterMinter
+        notBlacklisted(msg.sender)
+        notBlacklisted(minter)
+        returns (bool)
+    {
+        require(minters[minter], "address not a minter");
+
+        minterAllowed[minter] = minterAllowed[minter].sub(
+            decrement,
+            "decreased minter allowance below zero"
+        );
+
+        emit DecreaseMinterAllowance(minter, decrement);
+
         return true;
     }
 
