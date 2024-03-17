@@ -113,10 +113,19 @@ contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
      */
     function mint(address _to, uint256 _amount)
         external
+        virtual
         whenNotPaused
         onlyMinters
         notBlacklisted(msg.sender)
         notBlacklisted(_to)
+        returns (bool)
+    {
+        return _mint(_to, _amount);
+    }
+
+    function _mint(address _to, uint256 _amount)
+        internal
+        virtual
         returns (bool)
     {
         require(_to != address(0), "FiatToken: mint to the zero address");
