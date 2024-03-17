@@ -41,18 +41,6 @@ interface AggregatorV3Interface {
 }
 
 contract MockProofOfReserveFeed is AggregatorV3Interface {
-    // struct Phase {
-    //     uint16 id;
-    //     AggregatorV2V3Interface aggregator;
-    // }
-    // Phase private currentPhase;
-    // AggregatorV2V3Interface public proposedAggregator;
-    // mapping(uint16 => AggregatorV2V3Interface) public phaseAggregators;
-
-    // uint256 private constant PHASE_OFFSET = 64;
-    // uint256 private constant PHASE_SIZE = 16;
-    // uint256 private constant MAX_ID = 2**(PHASE_OFFSET + PHASE_SIZE) - 1;
-
     uint8 public decimal;
     uint80 public roundId;
     int256 public answer;

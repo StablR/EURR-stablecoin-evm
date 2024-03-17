@@ -4,7 +4,6 @@ import {
 } from "../../@types/generated";
 import { behavesLikeFiatTokenV2 } from "./FiatTokenV2.test";
 import { expectRevert } from "../helpers";
-import BN from "bn.js";
 import {
   NewChainReserveFeed,
   ProofOfReserveEnabled,
@@ -37,7 +36,7 @@ contract("FiatTokenV2_2", (accounts) => {
     await fiatToken.initializeV2_1({ from: fiatTokenOwner });
   });
 
-  // behavesLikeFiatTokenV2(accounts, () => fiatToken, fiatTokenOwner);
+  behavesLikeFiatTokenV2(accounts, () => fiatToken, fiatTokenOwner);
 
   describe("initializeV2_2", () => {
     const [, user] = accounts;
