@@ -156,6 +156,11 @@ contract FiatTokenV2_1 is FiatTokenV2 {
     }
 
     function getChainId() external virtual pure returns (uint256 chainId) {
+        return _chainId();
+    }
+
+    function _chainId() internal virtual pure returns (uint256) {
+        uint256 chainId;
         assembly {
             chainId := chainid()
         }
