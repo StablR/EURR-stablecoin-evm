@@ -22,14 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+require("dotenv").config();
 
-import {
-  FiatTokenV2Instance,
-  FiatTokenV21Instance,
-  FiatTokenV22Instance,
-} from "./generated";
+const MockPoRFeed = artifacts.require("MockProofOfReserveFeed");
 
-export type AnyFiatTokenV2Instance =
-  | FiatTokenV2Instance
-  | FiatTokenV21Instance
-  | FiatTokenV22Instance;
+module.exports = async (deployer) => {
+  console.log("Deploying MockProofOfReserveFeed contract...");
+
+  await deployer.deploy(MockPoRFeed);
+  const walletAddress = (await MockPoRFeed.deployed()).address;
+
+  console.log(
+    `>>>>>>> Deployed MockProofOfReserveFeed at ${walletAddress} <<<<<<<`
+  );
+};
