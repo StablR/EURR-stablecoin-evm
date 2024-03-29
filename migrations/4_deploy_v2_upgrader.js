@@ -5,10 +5,7 @@ const FiatTokenV2 = artifacts.require("FiatTokenV2");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 const V2Upgrader = artifacts.require("V2Upgrader");
 
-const {
-  PROXY_ADMIN_ADDRESS = "",
-  PROXY_CONTRACT_ADDRESS = "",
-} = process.env;
+const { PROXY_ADMIN_ADDRESS = "", PROXY_CONTRACT_ADDRESS = "" } = process.env;
 
 let proxyAdminAddress = PROXY_ADMIN_ADDRESS;
 let proxyContractAddress = PROXY_CONTRACT_ADDRESS;

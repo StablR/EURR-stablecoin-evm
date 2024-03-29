@@ -28,12 +28,11 @@ pragma solidity 0.6.12;
 import { ECRecover } from "../util/ECRecover.sol";
 
 contract ECRecoverTest {
-    function recover(
-        bytes32 digest,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external pure returns (address) {
-        return ECRecover.recover(digest, v, r, s);
+    function recover(bytes32 digest, bytes memory signature)
+        external
+        pure
+        returns (address)
+    {
+        return ECRecover.recover(digest, signature);
     }
 }

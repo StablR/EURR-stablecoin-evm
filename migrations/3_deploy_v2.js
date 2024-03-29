@@ -4,12 +4,11 @@ const some = require("lodash/some");
 const FiatTokenV2 = artifacts.require("FiatTokenV2");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 const FiatTokenUtil = artifacts.require("FiatTokenUtil");
+const SignatureChecker = artifacts.require("SignatureChecker");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
 
-const {
-  PROXY_CONTRACT_ADDRESS = "",
-} = process.env;
+const { PROXY_CONTRACT_ADDRESS = "" } = process.env;
 
 let proxyContractAddress = PROXY_CONTRACT_ADDRESS;
 
@@ -22,6 +21,10 @@ module.exports = async (deployer, network) => {
   }
 
   console.log(`FiatTokenProxy: ${proxyContractAddress}`);
+
+  console.log("Deploying and linking SignatureChecker library contract...");
+  await deployer.deploy(SignatureChecker);
+  await deployer.link(SignatureChecker, FiatTokenV2);
 
   console.log("Deploying FiatTokenV2 implementation contract...");
   await deployer.deploy(FiatTokenV2);

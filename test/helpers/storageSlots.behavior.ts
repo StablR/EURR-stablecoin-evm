@@ -4,6 +4,13 @@ import { FiatTokenProxyInstance } from "../../@types/generated";
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 const FiatTokenV1 = artifacts.require("FiatTokenV1");
 const FiatTokenV1_1 = artifacts.require("FiatTokenV1_1");
+const FiatTokenV2 = artifacts.require("FiatTokenV2");
+const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
+
+export const STORAGE_SLOT_NUMBERS = {
+  _deprecatedBlacklisted: 3,
+  balanceAndBlacklistStates: 9,
+};
 
 export function usesOriginalStorageSlotPositions<
   T extends Truffle.ContractInstance
@@ -39,6 +46,7 @@ export function usesOriginalStorageSlotPositions<
 
     let fiatToken: T;
     let proxy: FiatTokenProxyInstance;
+    let domainSeparator: string;
 
     beforeEach(async () => {
       fiatToken = await Contract.new();
@@ -63,6 +71,7 @@ export function usesOriginalStorageSlotPositions<
       await proxyAsFiatTokenV1.mint(alice, minted, { from: minter });
       await proxyAsFiatTokenV1.transfer(bob, transferred, { from: alice });
       await proxyAsFiatTokenV1.approve(charlie, allowance, { from: alice });
+      await proxyAsFiatTokenV1.blacklist(bob, { from: blacklister });
       await proxyAsFiatTokenV1.blacklist(charlie, { from: blacklister });
       await proxyAsFiatTokenV1.pause({ from: pauser });
 
@@ -71,6 +80,15 @@ export function usesOriginalStorageSlotPositions<
         await proxyAsFiatTokenV1_1.updateRescuer(rescuer, {
           from: owner,
         });
+      }
+      if (version >= 2) {
+        const proxyAsFiatTokenV2 = await FiatTokenV2.at(proxy.address);
+        await proxyAsFiatTokenV2.initializeV2(name);
+        domainSeparator = await proxyAsFiatTokenV2.DOMAIN_SEPARATOR();
+      }
+      if (version >= 2.1) {
+        const proxyAsFiatTokenV2_1 = await FiatTokenV2_1.at(proxy.address);
+        await proxyAsFiatTokenV2_1.initializeV2_1();
       }
     });
 
@@ -91,7 +109,7 @@ export function usesOriginalStorageSlotPositions<
       // slot 2 - blacklister
       expect(parseAddress(slots[2])).to.equal(blacklister); // blacklister
 
-      // slot 3 - blacklisted (mapping, slot is unused)
+      // slot 3 - blacklisted (mapping, slot)
       expect(slots[3]).to.equal("0");
 
       // slot 4 - name
@@ -133,37 +151,14 @@ export function usesOriginalStorageSlotPositions<
       });
     }
 
-    it("retains original storage slots for blacklisted mapping", async () => {
-      // blacklisted[alice]
-      let v = parseInt(
-        await readSlot(proxy.address, addressMappingSlot(alice, 3)),
-        16
-      );
-      expect(v).to.equal(0);
+    if (version >= 2) {
+      it("retains slot 15 for DOMAIN_SEPARATOR", async () => {
+        const slot = await readSlot(proxy.address, 15);
 
-      // blacklisted[charlie]
-      v = parseInt(
-        await readSlot(proxy.address, addressMappingSlot(charlie, 3)),
-        16
-      );
-      expect(v).to.equal(1);
-    });
-
-    it("retains original storage slots for balances mapping", async () => {
-      // balance[alice]
-      let v = parseInt(
-        await readSlot(proxy.address, addressMappingSlot(alice, 9)),
-        16
-      );
-      expect(v).to.equal(minted - transferred);
-
-      // balances[bob]
-      v = parseInt(
-        await readSlot(proxy.address, addressMappingSlot(bob, 9)),
-        16
-      );
-      expect(v).to.equal(transferred);
-    });
+        // Cached domain separator is deprecated in v2.2. But we still need to ensure the storage slot is retained.
+        expect("0x" + slot).to.equal(domainSeparator);
+      });
+    }
 
     it("retains original storage slots for allowed mapping", async () => {
       // allowed[alice][bob]
@@ -214,7 +209,7 @@ export function usesOriginalStorageSlotPositions<
   });
 }
 
-async function readSlot(
+export async function readSlot(
   address: string,
   slot: number | string
 ): Promise<string> {
@@ -234,7 +229,7 @@ function parseString(hex: string): string {
   return Buffer.from(hex.slice(0, len), "hex").toString("utf8");
 }
 
-function parseUint(hex: string): BN {
+export function parseUint(hex: string): BN {
   return new BN(hex, 16);
 }
 
@@ -246,7 +241,7 @@ function encodeAddress(addr: string): string {
   return addr.replace(/^0x/, "").toLowerCase().padStart(64, "0");
 }
 
-function addressMappingSlot(addr: string, pos: number): string {
+export function addressMappingSlot(addr: string, pos: number): string {
   return web3.utils.keccak256("0x" + encodeAddress(addr) + encodeUint(pos));
 }
 

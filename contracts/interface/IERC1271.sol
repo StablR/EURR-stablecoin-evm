@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  *
- * Copyright (c) 2018 zOS Global Limited.
+ * Copyright (c) 2018-2020 CENTRE SECZ
  * Copyright (c) 2022 Qredo Ltd.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,14 +25,19 @@
 
 pragma solidity 0.6.12;
 
-import { EIP712 } from "../util/EIP712.sol";
-
-contract EIP712Test {
-    function makeDomainSeparator(string calldata name, string calldata version)
+/**
+ * @dev Interface of the ERC1271 standard signature validation method for
+ * contracts as defined in https://eips.ethereum.org/EIPS/eip-1271[ERC-1271].
+ */
+interface IERC1271 {
+    /**
+     * @dev Should return whether the signature provided is valid for the provided data
+     * @param hash          Hash of the data to be signed
+     * @param signature     Signature byte array associated with the provided data hash
+     * @return magicValue   bytes4 magic value 0x1626ba7e when function passes
+     */
+    function isValidSignature(bytes32 hash, bytes memory signature)
         external
         view
-        returns (bytes32)
-    {
-        return EIP712.makeDomainSeparator(name, version);
-    }
+        returns (bytes4 magicValue);
 }

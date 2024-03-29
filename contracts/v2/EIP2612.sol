@@ -27,7 +27,8 @@ pragma solidity 0.6.12;
 
 import { AbstractFiatTokenV2 } from "./AbstractFiatTokenV2.sol";
 import { EIP712Domain } from "./EIP712Domain.sol";
-import { EIP712 } from "../util/EIP712.sol";
+import { MessageHashUtils } from "../util/MessageHashUtils.sol";
+import { SignatureChecker } from "../util/SignatureChecker.sol";
 
 /**
  * @title EIP-2612
@@ -54,7 +55,7 @@ abstract contract EIP2612 is AbstractFiatTokenV2, EIP712Domain {
      * @param owner     Token owner's address (Authorizer)
      * @param spender   Spender's address
      * @param value     Amount of allowance
-     * @param deadline  The time at which this expires (unix time), or max uint256 value to have no expiration
+     * @param deadline  The time at which the signature expires (unix time), or max uint256 value to signal no expiration
      * @param v         v of the signature
      * @param r         r of the signature
      * @param s         s of the signature
@@ -68,21 +69,49 @@ abstract contract EIP2612 is AbstractFiatTokenV2, EIP712Domain {
         bytes32 r,
         bytes32 s
     ) internal {
+        _permit(owner, spender, value, deadline, abi.encodePacked(r, s, v));
+    }
+
+    /**
+     * @notice Verify a signed approval permit and execute if valid
+     * @dev EOA wallet signatures should be packed in the order of r, s, v.
+     * @param owner      Token owner's address (Authorizer)
+     * @param spender    Spender's address
+     * @param value      Amount of allowance
+     * @param deadline   The time at which the signature expires (unix time), or max uint256 value to signal no expiration
+     * @param signature  Signature byte array signed by an EOA wallet or a contract wallet
+     */
+    function _permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        bytes memory signature
+    ) internal {
         require(
             deadline == type(uint256).max || deadline >= now,
             "FiatTokenV2: permit is expired"
         );
 
-        bytes memory data = abi.encode(
-            PERMIT_TYPEHASH,
-            owner,
-            spender,
-            value,
-            _permitNonces[owner]++,
-            deadline
+        bytes32 typedDataHash = MessageHashUtils.toTypedDataHash(
+            _domainSeparator(),
+            keccak256(
+                abi.encode(
+                    PERMIT_TYPEHASH,
+                    owner,
+                    spender,
+                    value,
+                    _permitNonces[owner]++,
+                    deadline
+                )
+            )
         );
         require(
-            EIP712.recover(DOMAIN_SEPARATOR, v, r, s, data) == owner,
+            SignatureChecker.isValidSignatureNow(
+                owner,
+                typedDataHash,
+                signature
+            ),
             "EIP2612: invalid signature"
         );
 

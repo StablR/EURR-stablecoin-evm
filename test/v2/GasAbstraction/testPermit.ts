@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
+import { MockErc1271WalletInstance } from "../../../@types/generated";
 import { Approval } from "../../../@types/generated/FiatTokenV2";
 import {
   ACCOUNTS_AND_KEYS,
-  MAX_UINT256,
+  MAX_UINT256_HEX,
   ZERO_ADDRESS,
 } from "../../helpers/constants";
 import { expectRevert, hexStringFromBuffer } from "../../helpers";
@@ -12,32 +12,50 @@ import {
   TestParams,
   signTransferAuthorization,
   permitTypeHash,
+  WalletType,
+  prepareSignature,
 } from "./helpers";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 
 export function testPermit({
+  version,
   getFiatToken,
+  getERC1271Wallet,
   getDomainSeparator,
   fiatTokenOwner,
   accounts,
+  signerWalletType,
+  signatureBytesType,
 }: TestParams): void {
-  describe("permit", () => {
-    let fiatToken: AnyFiatTokenV2Instance;
-    let domainSeparator: string;
+  describe(`permit with ${signerWalletType} wallet, ${signatureBytesType} signature interface`, async () => {
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];
 
     const initialBalance = 10e6;
     const permitParams = {
-      owner: alice.address,
+      owner: "",
       spender: bob.address,
       value: 7e6,
       nonce: 0,
-      deadline: MAX_UINT256,
+      deadline: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
     };
+
+    let fiatToken: AnyFiatTokenV2Instance;
+    let aliceWallet: MockErc1271WalletInstance;
+    let domainSeparator: string;
 
     beforeEach(async () => {
       fiatToken = getFiatToken();
+      aliceWallet = await getERC1271Wallet(alice.address);
       domainSeparator = getDomainSeparator();
+
+      // Initialize `owner` address either as Alice's EOA address or Alice's wallet address
+      if (signerWalletType == WalletType.AA) {
+        permitParams.owner = aliceWallet.address;
+      } else {
+        permitParams.owner = alice.address;
+      }
+
       await fiatToken.configureMinter(fiatTokenOwner, 1000000e6, {
         from: fiatTokenOwner,
       });
@@ -56,7 +74,7 @@ export function testPermit({
       // create a signed permit to grant Bob permission to spend Alice's funds
       // on behalf, and sign with Alice's key
       let nonce = 0;
-      let { v, r, s } = signPermit(
+      const signature1 = signPermit(
         owner,
         spender,
         value,
@@ -79,9 +97,7 @@ export function testPermit({
         spender,
         value,
         deadline,
-        v,
-        r,
-        s,
+        ...prepareSignature(signature1, signatureBytesType),
         { from: charlie }
       );
 
@@ -103,7 +119,7 @@ export function testPermit({
       // increment nonce
       nonce = 1;
       value = 1e6;
-      ({ v, r, s } = signPermit(
+      const signature2 = signPermit(
         owner,
         spender,
         1e6,
@@ -111,7 +127,7 @@ export function testPermit({
         deadline,
         domainSeparator,
         alice.key
-      ));
+      );
 
       // submit the permit
       result = await fiatToken.permit(
@@ -119,9 +135,7 @@ export function testPermit({
         spender,
         value,
         deadline,
-        v,
-        r,
-        s,
+        ...prepareSignature(signature2, signatureBytesType),
         { from: charlie }
       );
 
@@ -140,9 +154,9 @@ export function testPermit({
 
     it("grants allowance when a valid permit is given with (2^256 - 1) as deadline", async () => {
       const { owner, spender, value, nonce } = permitParams;
-      const deadline = MAX_UINT256;
+      const deadline = MAX_UINT256_HEX;
 
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -165,9 +179,7 @@ export function testPermit({
         spender,
         value,
         deadline,
-        v,
-        r,
-        s,
+        ...prepareSignature(signature, signatureBytesType),
         { from: charlie }
       );
 
@@ -187,7 +199,7 @@ export function testPermit({
     it("reverts if the signature does not match given parameters", async () => {
       const { owner, spender, value, nonce, deadline } = permitParams;
       // create a signed permit
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -204,9 +216,7 @@ export function testPermit({
           spender,
           value * 2, // pass incorrect value
           deadline,
-          v,
-          r,
-          s,
+          ...prepareSignature(signature, signatureBytesType),
           { from: charlie }
         ),
         "invalid signature"
@@ -217,7 +227,7 @@ export function testPermit({
       const { owner, spender, value, nonce, deadline } = permitParams;
       // create a signed permit to grant Bob permission to spend
       // Alice's funds on behalf, but sign with Bob's key instead of Alice's
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -230,9 +240,16 @@ export function testPermit({
       // try to cheat by submitting the permit that is signed by a
       // wrong person
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "invalid signature"
       );
     });
@@ -242,7 +259,7 @@ export function testPermit({
       // create a signed permit that won't be valid until 10 seconds
       // later
       const deadline = Math.floor(Date.now() / 1000) - 1;
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -254,9 +271,16 @@ export function testPermit({
 
       // try to submit the permit that is expired
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "permit is expired"
       );
     });
@@ -265,7 +289,7 @@ export function testPermit({
       const { owner, spender, value, deadline } = permitParams;
       const nonce = 1;
       // create a signed permit
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -279,9 +303,16 @@ export function testPermit({
 
       // try to submit the permit
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "invalid signature"
       );
     });
@@ -289,7 +320,7 @@ export function testPermit({
     it("reverts if the permit has already been used", async () => {
       const { owner, spender, value, nonce, deadline } = permitParams;
       // create a signed permit
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -300,15 +331,29 @@ export function testPermit({
       );
 
       // submit the permit
-      await fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-        from: charlie,
-      });
+      await fiatToken.permit(
+        owner,
+        spender,
+        value,
+        deadline,
+        ...prepareSignature(signature, signatureBytesType),
+        {
+          from: charlie,
+        }
+      );
 
       // try to submit the permit again
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "invalid signature"
       );
     });
@@ -332,9 +377,7 @@ export function testPermit({
         spender,
         value,
         deadline,
-        permit.v,
-        permit.r,
-        permit.s,
+        ...prepareSignature(permit, signatureBytesType),
         { from: charlie }
       );
 
@@ -357,9 +400,7 @@ export function testPermit({
           spender,
           1e6,
           deadline,
-          permit2.v,
-          permit2.r,
-          permit2.s,
+          ...prepareSignature(permit2, signatureBytesType),
           { from: charlie }
         ),
         "invalid signature"
@@ -371,7 +412,7 @@ export function testPermit({
       // create a signed permit that attempts to grant allowance to the
       // zero address
       const spender = ZERO_ADDRESS;
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -383,9 +424,16 @@ export function testPermit({
 
       // try to submit the permit with invalid approval parameters
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "approve to the zero address"
       );
     });
@@ -400,7 +448,7 @@ export function testPermit({
       // create a signed permit for a transfer
       const validAfter = 0;
       const nonce = hexStringFromBuffer(crypto.randomBytes(32));
-      const { v, r, s } = signTransferAuthorization(
+      const signature = signTransferAuthorization(
         from,
         to,
         value,
@@ -413,9 +461,16 @@ export function testPermit({
 
       // try to submit the transfer permit
       await expectRevert(
-        fiatToken.permit(from, to, value, validBefore, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          from,
+          to,
+          value,
+          validBefore,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        ),
         "invalid signature"
       );
     });
@@ -423,7 +478,7 @@ export function testPermit({
     it("reverts if the contract is paused", async () => {
       const { owner, spender, value, nonce, deadline } = permitParams;
       // create a signed permit
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -438,9 +493,14 @@ export function testPermit({
 
       // try to submit the permit
       await expectRevert(
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        }),
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          { from: charlie }
+        ),
         "paused"
       );
     });
@@ -448,7 +508,7 @@ export function testPermit({
     it("reverts if the owner or the spender is blacklisted", async () => {
       const { owner, spender, value, nonce, deadline } = permitParams;
       // create a signed permit
-      const { v, r, s } = signPermit(
+      const signature = signPermit(
         owner,
         spender,
         value,
@@ -462,9 +522,16 @@ export function testPermit({
       await fiatToken.blacklist(owner, { from: fiatTokenOwner });
 
       const submitTx = () =>
-        fiatToken.permit(owner, spender, value, deadline, v, r, s, {
-          from: charlie,
-        });
+        fiatToken.permit(
+          owner,
+          spender,
+          value,
+          deadline,
+          ...prepareSignature(signature, signatureBytesType),
+          {
+            from: charlie,
+          }
+        );
 
       // try to submit the permit
       await expectRevert(submitTx(), "account is blacklisted");
