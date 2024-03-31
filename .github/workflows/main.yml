@@ -20,7 +20,7 @@ jobs:
         run: npm install -g yarn@1.22.19
 
       - name: Install packages
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Setup local environment
         run: cp config.js.example config.js && ./start-ganache.sh
