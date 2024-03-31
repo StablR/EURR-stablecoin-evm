@@ -27,7 +27,7 @@ export function testPermit({
   signerWalletType,
   signatureBytesType,
 }: TestParams): void {
-  describe(`permit with ${signerWalletType} wallet, ${signatureBytesType} signature interface`, async () => {
+  describe(`permit with ${signerWalletType} wallet, ${signatureBytesType} signature interface version ${version}`, async () => {
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];
 

@@ -190,7 +190,7 @@ export function behavesLikeFiatTokenV2_1(
   getFiatToken: () => AnyFiatTokenV2Instance,
   fiatTokenOwner: string
 ): void {
-  const [minter, arbitraryAccount] = accounts.slice(3);
+  // const [minter, arbitraryAccount] = accounts.slice(3);
   let domainSeparator: string;
   let fiatToken: FiatTokenV21InstanceExtended;
 
