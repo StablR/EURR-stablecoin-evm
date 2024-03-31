@@ -4,29 +4,32 @@ on:
   push:
     branches:
       - "*"
-
 jobs:
-  build:
+  run_ci_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-      # Install nvm and use the specified Node.js version
-      - name: Setup Node.js
-        run: |
-          wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-          nvm install 16.14.0
-          nvm use 16.14.0
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.14.0"
 
-      - name: Adjust Yarn version
+      - name: Install Yarn
         run: npm install -g yarn@1.22.19
 
-      - name: Run install
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install
+      - name: Install packages
+        run: yarn install --frozen-lockfile
 
-      - run: yarn ganache -d > /dev/null &
-      - run: yarn test
+      - name: Setup local environment
+        run: cp config.js.example config.js && ./start-ganache.sh
+
+      - name: Run static checks
+        run: yarn static-check
+
+      - name: Run size check
+        run: yarn contract-size
+
+      - name: Run tests
+        run: yarn test
