@@ -1,21 +1,32 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 on:
   push:
     branches:
-    - "*"
+      - "*"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      # Install nvm and use the specified Node.js version
+      - name: Setup Node.js
+        run: |
+          wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          nvm install 16.14.0
+          nvm use 16.14.0
+
+      - name: Adjust Yarn version
+        run: npm install -g yarn@1.22.19
+
       - name: Run install
         uses: borales/actions-yarn@v4
         with:
-          cmd: install # will run yarn install command
+          cmd: install
 
       - run: yarn ganache -d > /dev/null &
       - run: yarn test
