@@ -21,7 +21,8 @@
     "slither": "slither --solc-disable-warnings --disable-color --exclude-dependencies .",
     "migrate": "truffle migrate",
     "rm:extra-migrations": "sh scripts/remove-extra-migrations.sh",
-    "verify": "truffle run verify FiatTokenV2 FiatTokenProxy"
+    "verify": "truffle run verify FiatTokenV2 FiatTokenProxy",
+    "contract-size": "truffle run contract-size"
   },
   "repository": {
     "type": "git",

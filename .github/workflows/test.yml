@@ -22,5 +22,8 @@ jobs:
       - name: Setup local environment
         run: yarn run ganache & sleep 5
 
+      - name: Run size check
+        run: yarn run contract-size
+
       - name: Run tests
         run: yarn run test
