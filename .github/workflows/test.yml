@@ -16,6 +16,15 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn@1.22.22
 
+      -   name: Setup SSH Keys and known_hosts
+          env:
+              SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          run: |
+              mkdir -p ~/.ssh
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
+              ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+              ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+
       - name: Install packages
         run: yarn install
 
