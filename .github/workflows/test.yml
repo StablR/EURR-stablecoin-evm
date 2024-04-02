@@ -16,10 +16,6 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn@1.22.22
 
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Install packages
         run: yarn install
 
