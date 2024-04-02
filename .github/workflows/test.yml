@@ -20,7 +20,7 @@ jobs:
         run: yarn install
 
       - name: Setup local environment
-        run: cp config.js.example config.js && ./start-ganache.sh
+        run: yarn run ganache
 
       - name: Run static checks
         run: yarn static-check

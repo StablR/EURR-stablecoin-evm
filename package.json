@@ -35,6 +35,7 @@
   },
   "homepage": "https://github.com/qredo/stablr-tokens#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "truffle-plugin-verify": "^0.5.21"
   },
   "devDependencies": {
