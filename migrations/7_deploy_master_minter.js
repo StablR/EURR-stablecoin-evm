@@ -2,10 +2,7 @@ require("dotenv").config();
 const MasterMinter = artifacts.require("MasterMinter.sol");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy.sol");
 
-const {
-  MASTERMINTER_ADDRESS = "",
-  PROXY_CONTRACT_ADDRESS = ""
-} = process.env;
+const { MASTERMINTER_ADDRESS = "", PROXY_CONTRACT_ADDRESS = "" } = process.env;
 
 let masterMinterAddress = MASTERMINTER_ADDRESS;
 let fiatTokenAddress = PROXY_CONTRACT_ADDRESS;

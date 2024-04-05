@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import { FiatTokenUtilInstance } from "../../../@types/generated";
-import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
-import { ACCOUNTS_AND_KEYS, MAX_UINT256 } from "../../helpers/constants";
+import { ACCOUNTS_AND_KEYS, MAX_UINT256_HEX } from "../../helpers/constants";
 import {
   expectRevert,
   hexStringFromBuffer,
@@ -11,6 +10,7 @@ import {
 } from "../../helpers";
 import { signTransferAuthorization, TestParams } from "./helpers";
 import { TransactionRawLog } from "../../../@types/TransactionRawLog";
+import { AnyFiatTokenV2Instance } from "../../../@types/AnyFiatTokenV2Instance";
 
 const FiatTokenUtil = artifacts.require("FiatTokenUtil");
 const ContractThatReverts = artifacts.require("ContractThatReverts");
@@ -20,29 +20,31 @@ export function testTransferWithMultipleAuthorizations({
   getDomainSeparator,
   fiatTokenOwner,
   accounts,
+  signerWalletType,
 }: TestParams): void {
-  describe("transferWithMultipleAuthorizations", () => {
-    let fiatToken: AnyFiatTokenV2Instance;
-    let fiatTokenUtil: FiatTokenUtilInstance;
-    let domainSeparator: string;
+  describe(`transferWithMultipleAuthorization with ${signerWalletType} wallet`, async () => {
     const [alice, bob] = ACCOUNTS_AND_KEYS;
     const charlie = accounts[1];
-    let nonce: string;
-
+    const nonce: string = hexStringFromBuffer(crypto.randomBytes(32));
     const initialBalance = 10e6;
     const transferParams = {
       from: alice.address,
       to: bob.address,
       value: 7e6,
       validAfter: 0,
-      validBefore: MAX_UINT256,
+      validBefore: MAX_UINT256_HEX,
+      nonce,
     };
+
+    let fiatToken: AnyFiatTokenV2Instance;
+    let fiatTokenUtil: FiatTokenUtilInstance;
+    let domainSeparator: string;
 
     beforeEach(async () => {
       fiatToken = getFiatToken();
       fiatTokenUtil = await FiatTokenUtil.new(fiatToken.address);
       domainSeparator = getDomainSeparator();
-      nonce = hexStringFromBuffer(crypto.randomBytes(32));
+
       await fiatToken.configureMinter(fiatTokenOwner, 1000000e6, {
         from: fiatTokenOwner,
       });

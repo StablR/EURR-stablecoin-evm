@@ -25,4 +25,14 @@
 
 import { FiatTokenV2Instance, FiatTokenV21Instance } from "./generated";
 
-export type AnyFiatTokenV2Instance = FiatTokenV2Instance | FiatTokenV21Instance;
+export interface FiatTokenV21InstanceExtended extends FiatTokenV21Instance {
+  permit?: typeof FiatTokenV2Instance.permit;
+  transferWithAuthorization?: typeof FiatTokenV2Instance.transferWithAuthorization;
+  receiveWithAuthorization?: typeof FiatTokenV2Instance.receiveWithAuthorization;
+  cancelAuthorization?: typeof FiatTokenV2Instance.cancelAuthorization;
+}
+
+export type AnyFiatTokenV2Instance =
+  | FiatTokenV2Instance
+  | FiatTokenV21Instance
+  | FiatTokenV21InstanceExtended;

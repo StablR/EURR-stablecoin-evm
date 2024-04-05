@@ -20,8 +20,8 @@ functionality:
 - `owner` - re-assign any of the roles except for `admin`
 - `admin` - upgrade the contract, and re-assign itself
 
-StablR will control the address of all roles, minters will be
-controlled by the entities that the StablR `masterMinter` elects to make minters
+StablR will control the address of all roles, minters will be controlled by the
+entities that the StablR `masterMinter` elects to make minters
 
 ## ERC-20
 
@@ -39,32 +39,34 @@ The Fiat Token allows multiple entities to create and destroy tokens.
 
 Each `minter` has a `mintingAllowance`, which the `masterMinter` configures. The
 `mintingAllowance` is how many tokens that minter may issue, and as a `minter`
-issues tokens, its `mintingAllowance` declines. The `masterMinter` will periodically reset
-the `mintingAllowance` as long as a `minter` remains in good standing with
-the organization and maintains adequate reserves for the tokens it has issued. The
-`mintingAllowance` is to limit the damage if any particular `minter` is
-compromised.
+issues tokens, its `mintingAllowance` declines. The `masterMinter` will
+periodically reset the `mintingAllowance` as long as a `minter` remains in good
+standing with the organization and maintains adequate reserves for the tokens it
+has issued. The `mintingAllowance` is to limit the damage if any particular
+`minter` is compromised.
 
 ### Adding Minters
 
-Adding minters via the `configureMinter` method. When a minter is
-configured a `mintingAllowance` is specified, which is the number of tokens that
-address is allowed to mint. As a `minter` mints tokens, the `mintingAllowance`
-will decline.
+Adding minters via the `configureMinter` method. When a minter is configured a
+`mintingAllowance` is specified, which is the number of tokens that address is
+allowed to mint. As a `minter` mints tokens, the `mintingAllowance` will
+decline.
 
 - Only the `masterMinter` role may call configureMinter.
 
 ### Resetting Minting Allowance
 
 The `minters` will need their allowance reset periodically to allow them to
-continue minting. When a `minter`'s allowance is low, the `masterMinter` can make another
-call to `configureMinter` to reset the `mintingAllowance` to a higher value.
+continue minting. When a `minter`'s allowance is low, the `masterMinter` can
+make another call to `configureMinter` to reset the `mintingAllowance` to a
+higher value.
 
 ### Removing Minters
 
-The `masterMinter` removes minters via the `removeMinter` method. This will remove the
-`minter` from the list of `minters` and set its `mintingAllowance` to 0. Once a
-`minter` is removed it will no longer be able to mint or burn tokens.
+The `masterMinter` removes minters via the `removeMinter` method. This will
+remove the `minter` from the list of `minters` and set its `mintingAllowance`
+to 0. Once a `minter` is removed it will no longer be able to mint or burn
+tokens.
 
 - Only the `masterMinter` role may call `removeMinter`.
 
@@ -112,16 +114,16 @@ tokens, approve, mint, or burn tokens.
 
 ### Adding a blacklisted address
 
-The `blacklister` blacklists an address via the `blacklist` method. The specified `account`
-will be added to the blacklist.
+The `blacklister` blacklists an address via the `blacklist` method. The
+specified `account` will be added to the blacklist.
 
 - Only the `blacklister` role may call `blacklist`.
 - Blacklisting emits a `Blacklist(account)` event
 
 ### Removing a blacklisted address
 
-The `blacklister` removes an address from the blacklist via the `unblacklist` method. The
-specified `account` will be removed from the blacklist.
+The `blacklister` removes an address from the blacklist via the `unblacklist`
+method. The specified `account` will be removed from the blacklist.
 
 - Only the `blacklister` role may call `unblacklist`.
 - Unblacklisting emits an `UnBlacklist(account)` event.
@@ -137,8 +139,8 @@ that caused the `pauser` to pause the contract.
 
 ### Pause
 
-The `pauser` will pause the contract via the `pause` method. This method will set the
-paused flag to true.
+The `pauser` will pause the contract via the `pause` method. This method will
+set the paused flag to true.
 
 - Only the `pauser` role may call pause.
 
@@ -146,9 +148,9 @@ paused flag to true.
 
 ### Unpause
 
-The `pauser` will unpause the contract via the `unpause` method. This method will set
-the `paused` flag to false. All functionality will be restored when the contract
-is unpaused.
+The `pauser` will unpause the contract via the `unpause` method. This method
+will set the `paused` flag to false. All functionality will be restored when the
+contract is unpaused.
 
 - Only the `pauser` role may call unpause.
 

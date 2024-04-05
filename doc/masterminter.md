@@ -1,8 +1,9 @@
 # MasterMinter contract
 
->*The MasterMinter governance contract structure is an alternative option for managing
-stablecoin minters. Instead a more efficient governance solution will be used based on
-the [Qredo Network](https://www.qredo.com/) which provides a cost-efficent and flexible option.*
+> _The MasterMinter governance contract structure is an alternative option for
+> managing stablecoin minters. Instead a more efficient governance solution will
+> be used based on the [Qredo Network](https://www.qredo.com/) which provides a
+> cost-efficent and flexible option._
 
 The MasterMinter is a governance contract. It delegates the functionality of the
 `masterMinter` role in the StablR token contract to multiple addresses. (The
@@ -49,8 +50,8 @@ contract to call minter management functions on the FiatToken contract:
 
 Together, these four functions are defined as the `MinterManagementInterface`.
 The `MasterMinter` contains the address of a `minterManager` that implements the
-`MinterManagementInterface`. The `MasterMinter` interacts with the Stablecoin token
-via the `minterManager`.
+`MinterManagementInterface`. The `MasterMinter` interacts with the Stablecoin
+token via the `minterManager`.
 
 When a `controller` calls a function on `MasterMinter`, the `MasterMinter` will
 call the appropriate function on the `FiatToken` contract on its behalf. Both

@@ -25,14 +25,14 @@
 
 pragma solidity 0.6.12;
 
-import { EIP712 } from "../util/EIP712.sol";
+import { MessageHashUtils } from "../util/MessageHashUtils.sol";
 
-contract EIP712Test {
-    function makeDomainSeparator(string calldata name, string calldata version)
+contract MessageHashUtilsTest {
+    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash)
         external
-        view
-        returns (bytes32)
+        pure
+        returns (bytes32 digest)
     {
-        return EIP712.makeDomainSeparator(name, version);
+        return MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
     }
 }
