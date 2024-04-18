@@ -32,7 +32,7 @@ pragma solidity 0.6.12;
  */
 contract EIP712Domain {
     // was originally DOMAIN_SEPARATOR
-    // but that has been moved to a method so we can override it in V2_2+
+    // but that has been moved to a method so we can override it in V2_1+
     bytes32 internal _DEPRECATED_CACHED_DOMAIN_SEPARATOR;
 
     /**

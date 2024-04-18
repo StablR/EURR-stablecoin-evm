@@ -34,5 +34,4 @@ export interface FiatTokenV21InstanceExtended extends FiatTokenV21Instance {
 
 export type AnyFiatTokenV2Instance =
   | FiatTokenV2Instance
-  | FiatTokenV21Instance
   | FiatTokenV21InstanceExtended;

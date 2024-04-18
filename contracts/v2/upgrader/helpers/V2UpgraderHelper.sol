@@ -25,7 +25,7 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV1 } from "../../v1/FiatTokenV1.sol";
+import { FiatTokenV1 } from "../../../v1/FiatTokenV1.sol";
 import { AbstractUpgraderHelper } from "./AbstractUpgraderHelper.sol";
 
 /**

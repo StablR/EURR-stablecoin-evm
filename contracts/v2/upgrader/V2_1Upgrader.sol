@@ -27,22 +27,31 @@ pragma solidity 0.6.12;
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { Ownable } from "../../v1/Ownable.sol";
+import { AbstractV2Upgrader } from "./AbstractV2Upgrader.sol";
 import { FiatTokenV2_1 } from "../FiatTokenV2_1.sol";
 import { FiatTokenProxy } from "../../v1/FiatTokenProxy.sol";
-import { V2UpgraderHelper } from "./V2UpgraderHelper.sol";
+import { V2_1UpgraderHelper } from "./helpers/V2_1UpgraderHelper.sol";
 
 /**
  * @title V2.1 Upgrader
  * @dev Read docs/v2.1_upgrade.md
  */
-contract V2_1Upgrader is Ownable {
+contract V2_1Upgrader is AbstractV2Upgrader {
     using SafeMath for uint256;
 
-    FiatTokenProxy private _proxy;
-    FiatTokenV2_1 private _implementation;
-    address private _newProxyAdmin;
-    V2UpgraderHelper private _helper;
+    struct FiatTokenMetadata {
+        string name;
+        uint8 decimals;
+        string currency;
+        string version;
+        bytes32 domainSeparator;
+        address masterMinter;
+        address owner;
+        address pauser;
+        address blacklister;
+        bool paused;
+        uint256 totalSupply;
+    }
 
     /**
      * @notice Constructor
@@ -54,44 +63,15 @@ contract V2_1Upgrader is Ownable {
         FiatTokenProxy proxyAddr,
         FiatTokenV2_1 implementationAddr,
         address newProxyAdminAddr
-    ) public Ownable() {
-        _proxy = proxyAddr;
-        _implementation = implementationAddr;
-        _newProxyAdmin = newProxyAdminAddr;
-        _helper = new V2UpgraderHelper(address(proxyAddr));
-    }
-
-    /**
-     * @notice The address of the FiatTokenProxy contract
-     * @return Contract address
-     */
-    function proxy() external view returns (address) {
-        return address(_proxy);
-    }
-
-    /**
-     * @notice The address of the FiatTokenV2 implementation contract
-     * @return Contract address
-     */
-    function implementation() external view returns (address) {
-        return address(_implementation);
-    }
-
-    /**
-     * @notice The address of the V2UpgraderHelper contract
-     * @return Contract address
-     */
-    function helper() external view returns (address) {
-        return address(_helper);
-    }
-
-    /**
-     * @notice The address to which the proxy admin role will be transferred
-     * after the upgrade is completed
-     * @return Address
-     */
-    function newProxyAdmin() external view returns (address) {
-        return _newProxyAdmin;
+    )
+        public
+        AbstractV2Upgrader(
+            proxyAddr,
+            address(implementationAddr),
+            newProxyAdminAddr
+        )
+    {
+        _helper = new V2_1UpgraderHelper(address(proxyAddr));
     }
 
     /**
@@ -103,25 +83,31 @@ contract V2_1Upgrader is Ownable {
         // The helper needs to be used to read contract state because
         // AdminUpgradeabilityProxy does not allow the proxy admin to make
         // proxy calls.
+        V2_1UpgraderHelper v21Helper = V2_1UpgraderHelper(address(_helper));
 
         // Check that this contract sufficient funds to run the tests
-        uint256 contractBal = _helper.balanceOf(address(this));
-        require(contractBal >= 2e5, "V2_1Upgrader: 0.2 EURR needed");
+        uint256 contractBal = v21Helper.balanceOf(address(this));
+        require(contractBal >= 2e5, "V2_2Upgrader: 0.2 FiatToken needed");
 
-        uint256 callerBal = _helper.balanceOf(msg.sender);
+        uint256 callerBal = v21Helper.balanceOf(msg.sender);
 
         // Keep original contract metadata
-        string memory name = _helper.name();
-        string memory symbol = _helper.symbol();
-        uint8 decimals = _helper.decimals();
-        string memory currency = _helper.currency();
-        address masterMinter = _helper.masterMinter();
-        address ownerAddr = _helper.fiatTokenOwner();
-        address pauser = _helper.pauser();
-        address blacklister = _helper.blacklister();
+        FiatTokenMetadata memory originalMetadata = FiatTokenMetadata(
+            v21Helper.name(),
+            v21Helper.decimals(),
+            v21Helper.currency(),
+            v21Helper.version(),
+            v21Helper.DOMAIN_SEPARATOR(),
+            v21Helper.masterMinter(),
+            v21Helper.fiatTokenOwner(),
+            v21Helper.pauser(),
+            v21Helper.blacklister(),
+            v21Helper.paused(),
+            v21Helper.totalSupply()
+        );
 
         // Change implementation contract address
-        _proxy.upgradeTo(address(_implementation));
+        _proxy.upgradeTo(_implementation);
 
         // Transfer proxy admin role
         _proxy.changeAdmin(_newProxyAdmin);
@@ -132,19 +118,26 @@ contract V2_1Upgrader is Ownable {
 
         // Sanity test
         // Check metadata
+        FiatTokenMetadata memory upgradedMetadata = FiatTokenMetadata(
+            v2_1.name(),
+            v2_1.decimals(),
+            v2_1.currency(),
+            v2_1.version(),
+            v2_1.DOMAIN_SEPARATOR(),
+            v2_1.masterMinter(),
+            v2_1.owner(),
+            v2_1.pauser(),
+            v2_1.blacklister(),
+            v2_1.paused(),
+            v2_1.totalSupply()
+        );
+
         require(
-            keccak256(bytes(name)) == keccak256(bytes(v2_1.name())) &&
-                keccak256(bytes(symbol)) == keccak256(bytes(v2_1.symbol())) &&
-                decimals == v2_1.decimals() &&
-                keccak256(bytes(currency)) ==
-                keccak256(bytes(v2_1.currency())) &&
-                masterMinter == v2_1.masterMinter() &&
-                ownerAddr == v2_1.owner() &&
-                pauser == v2_1.pauser() &&
-                blacklister == v2_1.blacklister(),
+            checkFiatTokenMetadataEqual(originalMetadata, upgradedMetadata),
             "V2_1Upgrader: metadata test failed"
         );
 
+        // Test transfer
         // Test balanceOf
         require(
             v2_1.balanceOf(address(this)) == contractBal,
@@ -161,46 +154,50 @@ contract V2_1Upgrader is Ownable {
 
         // Test approve/transferFrom
         require(
-            v2_1.approve(address(_helper), 1e5) &&
-                v2_1.allowance(address(this), address(_helper)) == 1e5 &&
-                _helper.transferFrom(address(this), msg.sender, 1e5) &&
+            v2_1.approve(address(v21Helper), 1e5) &&
+                v2_1.allowance(address(this), address(v21Helper)) == 1e5 &&
+                v21Helper.transferFrom(address(this), msg.sender, 1e5) &&
                 v2_1.allowance(address(this), msg.sender) == 0 &&
                 v2_1.balanceOf(msg.sender) == callerBal.add(2e5) &&
                 v2_1.balanceOf(address(this)) == contractBal.sub(2e5),
             "V2_1Upgrader: approve/transferFrom test failed"
         );
 
-        // Transfer any remaining EURR to the caller
-        withdrawEURR();
+        // Test increase/decrease allowance
+        require(
+            v2_1.increaseAllowance(address(v21Helper), 1e5) &&
+                v2_1.allowance(address(this), address(v21Helper)) == 1e5 &&
+                v21Helper.decreaseAllowance(address(v21Helper), 1e5) &&
+                v2_1.allowance(address(this), msg.sender) == 0,
+            "V2_1Upgrader: increase/decrease allowance test failed"
+        );
+
+        // Transfer any remaining FiatToken to the caller
+        withdrawFiatToken();
 
         // Tear down
-        _helper.tearDown();
-        selfdestruct(msg.sender);
+        tearDown();
     }
 
     /**
-     * @notice Withdraw any EURR in the contract
+     * @dev Checks whether two FiatTokenMetadata are equal.
+     * @return true if the two metadata are equal, false otherwise.
      */
-    function withdrawEURR() public onlyOwner {
-        IERC20 eurr = IERC20(address(_proxy));
-        uint256 balance = eurr.balanceOf(address(this));
-        if (balance > 0) {
-            require(
-                eurr.transfer(msg.sender, balance),
-                "V2_1Upgrader: failed to withdraw EURR"
-            );
-        }
-    }
-
-    /**
-     * @notice Transfer proxy admin role to newProxyAdmin, and self-destruct
-     */
-    function abortUpgrade() external onlyOwner {
-        // Transfer proxy admin role
-        _proxy.changeAdmin(_newProxyAdmin);
-
-        // Tear down
-        _helper.tearDown();
-        selfdestruct(msg.sender);
+    function checkFiatTokenMetadataEqual(
+        FiatTokenMetadata memory a,
+        FiatTokenMetadata memory b
+    ) private pure returns (bool) {
+        return
+            keccak256(bytes(a.name)) == keccak256(bytes(b.name)) &&
+            a.decimals == b.decimals &&
+            keccak256(bytes(a.currency)) == keccak256(bytes(b.currency)) &&
+            keccak256(bytes(a.version)) == keccak256(bytes(b.version)) &&
+            a.domainSeparator == b.domainSeparator &&
+            a.masterMinter == b.masterMinter &&
+            a.owner == b.owner &&
+            a.pauser == b.pauser &&
+            a.blacklister == b.blacklister &&
+            a.paused == b.paused &&
+            a.totalSupply == b.totalSupply;
     }
 }

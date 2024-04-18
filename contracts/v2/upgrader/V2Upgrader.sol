@@ -28,7 +28,7 @@ pragma solidity 0.6.12;
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { FiatTokenV2 } from "../FiatTokenV2.sol";
 import { FiatTokenProxy } from "../../v1/FiatTokenProxy.sol";
-import { V2UpgraderHelper } from "./V2UpgraderHelper.sol";
+import { V2UpgraderHelper } from "./helpers/V2UpgraderHelper.sol";
 import { AbstractV2Upgrader } from "./AbstractV2Upgrader.sol";
 
 /**
