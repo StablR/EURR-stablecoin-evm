@@ -25,8 +25,8 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV1 } from "../../v1/FiatTokenV1.sol";
-import { Ownable } from "../../v1/Ownable.sol";
+import { FiatTokenV1 } from "../../../v1/FiatTokenV1.sol";
+import { AbstractUpgraderHelper } from "./AbstractUpgraderHelper.sol";
 
 /**
  * @title V2 Upgrader Helper
@@ -34,24 +34,15 @@ import { Ownable } from "../../v1/Ownable.sol";
  * proxy admin role. (Proxy admins cannot call delegated methods.) It is also
  * used to test approve/transferFrom.
  */
-contract V2UpgraderHelper is Ownable {
-    address private _proxy;
-
+contract V2UpgraderHelper is AbstractUpgraderHelper {
     /**
      * @notice Constructor
      * @param fiatTokenProxy    Address of the FiatTokenProxy contract
      */
-    constructor(address fiatTokenProxy) public Ownable() {
-        _proxy = fiatTokenProxy;
-    }
-
-    /**
-     * @notice The address of the FiatTokenProxy contract
-     * @return Contract address
-     */
-    function proxy() external view returns (address) {
-        return address(_proxy);
-    }
+    constructor(address fiatTokenProxy)
+        public
+        AbstractUpgraderHelper(fiatTokenProxy)
+    {}
 
     /**
      * @notice Call name()
@@ -140,12 +131,5 @@ contract V2UpgraderHelper is Ownable {
         uint256 value
     ) external returns (bool) {
         return FiatTokenV1(_proxy).transferFrom(from, to, value);
-    }
-
-    /**
-     * @notice Tear down the contract (self-destruct)
-     */
-    function tearDown() external onlyOwner {
-        selfdestruct(msg.sender);
     }
 }

@@ -23,15 +23,38 @@
  * SOFTWARE.
  */
 
-import { FiatTokenV2Instance, FiatTokenV21Instance } from "./generated";
+pragma solidity 0.6.12;
 
-export interface FiatTokenV21InstanceExtended extends FiatTokenV21Instance {
-  permit?: typeof FiatTokenV2Instance.permit;
-  transferWithAuthorization?: typeof FiatTokenV2Instance.transferWithAuthorization;
-  receiveWithAuthorization?: typeof FiatTokenV2Instance.receiveWithAuthorization;
-  cancelAuthorization?: typeof FiatTokenV2Instance.cancelAuthorization;
+import { Ownable } from "../../../v1/Ownable.sol";
+
+/**
+ * @dev An abstract contract to encapsulate any common logic for any V2+ Upgrader Helper contracts.
+ * The helper enables the upgrader to read some contract state before it renounces the
+ * proxy admin role (Proxy admins cannot call delegated methods).
+ */
+abstract contract AbstractUpgraderHelper is Ownable {
+    address internal _proxy;
+
+    /**
+     * @notice Constructor
+     * @param fiatTokenProxy    Address of the FiatTokenProxy contract
+     */
+    constructor(address fiatTokenProxy) public Ownable() {
+        _proxy = fiatTokenProxy;
+    }
+
+    /**
+     * @notice The address of the FiatTokenProxy contract
+     * @return Contract address
+     */
+    function proxy() external view returns (address) {
+        return _proxy;
+    }
+
+    /**
+     * @notice Tear down the contract (self-destruct)
+     */
+    function tearDown() external onlyOwner {
+        selfdestruct(msg.sender);
+    }
 }
-
-export type AnyFiatTokenV2Instance =
-  | FiatTokenV2Instance
-  | FiatTokenV21InstanceExtended;

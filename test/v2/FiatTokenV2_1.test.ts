@@ -2,6 +2,10 @@ import {
   AnyFiatTokenV2Instance,
   FiatTokenV21InstanceExtended,
 } from "../../@types/AnyFiatTokenV2Instance";
+import {
+  DecreaseMinterAllowance,
+  IncreaseMinterAllowance,
+} from "../../@types/generated/FiatTokenV21";
 import { expectRevert, initializeToVersion } from "../helpers";
 import { MAX_UINT256_BN } from "../helpers/constants";
 import { usesOriginalStorageSlotPositions } from "../helpers/storageSlots.behavior";

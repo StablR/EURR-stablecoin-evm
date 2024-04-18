@@ -26,81 +26,39 @@
 pragma solidity 0.6.12;
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { Ownable } from "../../v1/Ownable.sol";
 import { FiatTokenV2 } from "../FiatTokenV2.sol";
 import { FiatTokenProxy } from "../../v1/FiatTokenProxy.sol";
-import { V2UpgraderHelper } from "./V2UpgraderHelper.sol";
+import { V2UpgraderHelper } from "./helpers/V2UpgraderHelper.sol";
+import { AbstractV2Upgrader } from "./AbstractV2Upgrader.sol";
 
 /**
  * @title V2 Upgrader
- * @notice Performs EURR v2 upgrade, and runs a basic sanity test in a single
- * atomic transaction, rolling back if any issues are found. This may be
- * overkill, but the peace of mind is worth the gas spent. By performing the
+ * @notice Performs FiatToken v2 upgrade, and runs a basic sanity test in a single
+ * atomic transaction, rolling back if any issues are found. By performing the
  * upgrade atomically, it ensures that there is no disruption of service if the
  * upgrade is not successful for some unforeseen circumstances.
- * @dev Read docs/v2_upgrade.md
+ * @dev Read doc/v2_upgrade.md
  */
-contract V2Upgrader is Ownable {
+contract V2Upgrader is AbstractV2Upgrader {
     using SafeMath for uint256;
 
-    FiatTokenProxy private _proxy;
-    FiatTokenV2 private _implementation;
-    address private _newProxyAdmin;
     string private _newName;
-    V2UpgraderHelper private _helper;
 
     /**
      * @notice Constructor
-     * @param proxyAddr          FiatTokenProxy contract
-     * @param implementationAddr FiatTokenV2 implementation contract
-     * @param newProxyAdminAddr  Grantee of proxy admin role after upgrade
-     * @param newNameValue       New ERC20 name (e.g. "EUR//R" -> "EUR Coin")
+     * @param proxy             FiatTokenProxy contract
+     * @param implementation    FiatTokenV2 implementation contract
+     * @param newProxyAdmin     Grantee of proxy admin role after upgrade
+     * @param newName           New ERC20 name (e.g. "USD//C" -> "USD Coin")
      */
     constructor(
-        FiatTokenProxy proxyAddr,
-        FiatTokenV2 implementationAddr,
-        address newProxyAdminAddr,
-        string memory newNameValue
-    ) public Ownable() {
-        _proxy = proxyAddr;
-        _implementation = implementationAddr;
-        _newProxyAdmin = newProxyAdminAddr;
-        _newName = newNameValue;
-        _helper = new V2UpgraderHelper(address(proxyAddr));
-    }
-
-    /**
-     * @notice The address of the FiatTokenProxy contract
-     * @return Contract address
-     */
-    function proxy() external view returns (address) {
-        return address(_proxy);
-    }
-
-    /**
-     * @notice The address of the FiatTokenV2 implementation contract
-     * @return Contract address
-     */
-    function implementation() external view returns (address) {
-        return address(_implementation);
-    }
-
-    /**
-     * @notice The address of the V2UpgraderHelper contract
-     * @return Contract address
-     */
-    function helper() external view returns (address) {
-        return address(_helper);
-    }
-
-    /**
-     * @notice The address to which the proxy admin role will be transferred
-     * after the upgrade is completed
-     * @return Address
-     */
-    function newProxyAdmin() external view returns (address) {
-        return _newProxyAdmin;
+        FiatTokenProxy proxy,
+        FiatTokenV2 implementation,
+        address newProxyAdmin,
+        string memory newName
+    ) public AbstractV2Upgrader(proxy, address(implementation), newProxyAdmin) {
+        _newName = newName;
+        _helper = new V2UpgraderHelper(address(proxy));
     }
 
     /**
@@ -120,24 +78,25 @@ contract V2Upgrader is Ownable {
         // The helper needs to be used to read contract state because
         // AdminUpgradeabilityProxy does not allow the proxy admin to make
         // proxy calls.
+        V2UpgraderHelper v2Helper = V2UpgraderHelper(address(_helper));
 
         // Check that this contract sufficient funds to run the tests
-        uint256 contractBal = _helper.balanceOf(address(this));
-        require(contractBal >= 2e5, "V2Upgrader: 0.2 EURR needed");
+        uint256 contractBal = v2Helper.balanceOf(address(this));
+        require(contractBal >= 2e5, "V2Upgrader: 0.2 FiatToken needed");
 
-        uint256 callerBal = _helper.balanceOf(msg.sender);
+        uint256 callerBal = v2Helper.balanceOf(msg.sender);
 
         // Keep original contract metadata
-        string memory symbol = _helper.symbol();
-        uint8 decimals = _helper.decimals();
-        string memory currency = _helper.currency();
-        address masterMinter = _helper.masterMinter();
-        address ownerAddr = _helper.fiatTokenOwner();
-        address pauser = _helper.pauser();
-        address blacklister = _helper.blacklister();
+        string memory symbol = v2Helper.symbol();
+        uint8 decimals = v2Helper.decimals();
+        string memory currency = v2Helper.currency();
+        address masterMinter = v2Helper.masterMinter();
+        address owner = v2Helper.fiatTokenOwner();
+        address pauser = v2Helper.pauser();
+        address blacklister = v2Helper.blacklister();
 
         // Change implementation contract address
-        _proxy.upgradeTo(address(_implementation));
+        _proxy.upgradeTo(_implementation);
 
         // Transfer proxy admin role
         _proxy.changeAdmin(_newProxyAdmin);
@@ -154,7 +113,7 @@ contract V2Upgrader is Ownable {
                 decimals == v2.decimals() &&
                 keccak256(bytes(currency)) == keccak256(bytes(v2.currency())) &&
                 masterMinter == v2.masterMinter() &&
-                ownerAddr == v2.owner() &&
+                owner == v2.owner() &&
                 pauser == v2.pauser() &&
                 blacklister == v2.blacklister(),
             "V2Upgrader: metadata test failed"
@@ -176,46 +135,19 @@ contract V2Upgrader is Ownable {
 
         // Test approve/transferFrom
         require(
-            v2.approve(address(_helper), 1e5) &&
-                v2.allowance(address(this), address(_helper)) == 1e5 &&
-                _helper.transferFrom(address(this), msg.sender, 1e5) &&
+            v2.approve(address(v2Helper), 1e5) &&
+                v2.allowance(address(this), address(v2Helper)) == 1e5 &&
+                v2Helper.transferFrom(address(this), msg.sender, 1e5) &&
                 v2.allowance(address(this), msg.sender) == 0 &&
                 v2.balanceOf(msg.sender) == callerBal.add(2e5) &&
                 v2.balanceOf(address(this)) == contractBal.sub(2e5),
             "V2Upgrader: approve/transferFrom test failed"
         );
 
-        // Transfer any remaining ERUR to the caller
-        withdrawEURR();
+        // Transfer any remaining FiatToken to the caller
+        withdrawFiatToken();
 
         // Tear down
-        _helper.tearDown();
-        selfdestruct(msg.sender);
-    }
-
-    /**
-     * @notice Withdraw any EURR in the contract
-     */
-    function withdrawEURR() public onlyOwner {
-        IERC20 eurr = IERC20(address(_proxy));
-        uint256 balance = eurr.balanceOf(address(this));
-        if (balance > 0) {
-            require(
-                eurr.transfer(msg.sender, balance),
-                "V2Upgrader: failed to withdraw EURR"
-            );
-        }
-    }
-
-    /**
-     * @notice Transfer proxy admin role to newProxyAdmin, and self-destruct
-     */
-    function abortUpgrade() external onlyOwner {
-        // Transfer proxy admin role
-        _proxy.changeAdmin(_newProxyAdmin);
-
-        // Tear down
-        _helper.tearDown();
-        selfdestruct(msg.sender);
+        tearDown();
     }
 }
